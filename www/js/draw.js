@@ -5,33 +5,33 @@ APP.Size = {
 };
 
 APP.Rooms = {
-    'study'        : {x: 20,  y: 20,  people: []},
-    'hall'         : {x: 170, y: 20,  people: []},
-    'lounge'       : {x: 320, y: 20,  people: []},
-    'library'      : {x: 20,  y: 170, people: []},
-    'billiard'     : {x: 170, y: 170, people: []},
-    'dining'       : {x: 320, y: 170, people: []},
-    'conservatory' : {x: 20,  y: 320, people: []},
-    'ballroom'     : {x: 170, y: 320, people: []},
-    'kitchen'      : {x: 320, y: 320, people: []}
+    'study'        : {x: 20,  y: 20,  people: [], neighbors: ['hallway1', 'hallway3', 'kitchen']},
+    'hall'         : {x: 170, y: 20,  people: [], neighbors: ['hallway1', 'hallway2', 'hallway4']},
+    'lounge'       : {x: 320, y: 20,  people: [], neighbors: ['hallway2', 'hallway5', 'conservatory']},
+    'library'      : {x: 20,  y: 170, people: [], neighbors: ['hallway3', 'hallway6', 'hallway8']},
+    'billiard'     : {x: 170, y: 170, people: [], neighbors: ['hallway4', 'hallway6', 'hallway7', 'hallway9']},
+    'dining'       : {x: 320, y: 170, people: [], neighbors: ['hallway5', 'hallway7', 'hallway10']},
+    'conservatory' : {x: 20,  y: 320, people: [], neighbors: ['hallway8', 'hallway11', 'lounge']},
+    'ballroom'     : {x: 170, y: 320, people: [], neighbors: ['hallway9', 'hallway11', 'hallway12']},
+    'kitchen'      : {x: 320, y: 320, people: [], neighbors: ['hallway10', 'hallway12', 'study']}
 };
 
 APP.Hallways = {
     Horizontal: {
-        'hallway1'  : {x: 105, y: 55,  people: []},
-        'hallway2'  : {x: 255, y: 55,  people: []},
-        'hallway6'  : {x: 105, y: 205, people: []},
-        'hallway7'  : {x: 255, y: 205, people: []},
-        'hallway11' : {x: 105, y: 355, people: []},
-        'hallway12' : {x: 255, y: 355, people: []}
+        'hallway1'  : {x: 105, y: 55,  people: [], neighbors: ['study', 'hall']},
+        'hallway2'  : {x: 255, y: 55,  people: [], neighbors: ['hall', 'lounge']},
+        'hallway6'  : {x: 105, y: 205, people: [], neighbors: ['library', 'billiard']},
+        'hallway7'  : {x: 255, y: 205, people: [], neighbors: ['billiard', 'dining']},
+        'hallway11' : {x: 105, y: 355, people: [], neighbors: ['conservatory', 'ballroom']},
+        'hallway12' : {x: 255, y: 355, people: [], neighbors: ['ballroom', 'kitchen']}
     },
     Vertical: {
-        'hallway3'  : {x: 55,  y: 105, people: []},
-        'hallway4'  : {x: 205, y: 105, people: []},
-        'hallway5'  : {x: 355, y: 105, people: []},
-        'hallway8'  : {x: 55,  y: 255, people: []},
-        'hallway9'  : {x: 205, y: 255, people: []},
-        'hallway10' : {x: 355, y: 255, people: []}
+        'hallway3'  : {x: 55,  y: 105, people: [], neighbors: ['study', 'library']},
+        'hallway4'  : {x: 205, y: 105, people: [], neighbors: ['hall', 'billiard']},
+        'hallway5'  : {x: 355, y: 105, people: [], neighbors: ['lounge', 'dining']},
+        'hallway8'  : {x: 55,  y: 255, people: [], neighbors: ['library', 'conservatory']},
+        'hallway9'  : {x: 205, y: 255, people: [], neighbors: ['billiard', 'ballroom']},
+        'hallway10' : {x: 355, y: 255, people: [], neighbors: ['dining', 'kitchen']}
     }
 };
 

@@ -38,6 +38,10 @@ function init() {
 
 } // init()
 
+function getMyLocation() {
+    return APP.Players[APP.Me.character].location;
+} // getMyLocation()
+
 function updateCharacter(character, new_location) {
     var old_location = APP.Players[character].location;
     APP.Players[character].location = new_location;
@@ -59,26 +63,31 @@ function updateCharacter(character, new_location) {
     }
 } // updateCharacter()
 
-function moveCharacterUsingHiddenPassage(character, passage) {
-    var room = '';
-
+function getHiddenPassageDestination(passage) {
     switch (passage) {
         case 'top-left':
-            room = 'kitchen';
-            break;
+            return 'kitchen';
         case 'top-right':
-            room = 'conservatory';
-            break;
+            return 'conservatory';
         case 'bottom-left':
-            room = 'lounge';
-            break;
+            return 'lounge';
         case 'bottom-right':
-            room = 'study';
-            break;
+            return 'study';
     }
+    return passage;
+} // getHiddenPassageDestination()
 
-    moveCharacter(character, room);
-} // moveCharacterUsingHiddenPassage()
+function isValidNeighbor(location1, location2) {
+    var index = -1;
+    if (APP.Rooms[location1]) {
+        index = APP.Rooms[location1].neighbors.indexOf(location2);
+    } else if (APP.Hallways.Horizontal[location1]) {
+        index = APP.Hallways.Horizontal[location1].neighbors.indexOf(location2);
+    } else if (APP.Hallways.Vertical[location1]) {
+        index = APP.Hallways.Vertical[location1].neighbors.indexOf(location2);
+    }
+    return index >= 0;
+} // isValidNeighbor()
 
 function moveCharacter(character, target) {
     var total_people = 0, remainder = null,
@@ -173,11 +182,15 @@ $('body').on('click', 'rect', function () {
         type = $this.data('type'),
         room = $this.data('id');
 
-    updateCharacter(APP.Me.character, room);
-
     if (type === 'passage') {
-        moveCharacterUsingHiddenPassage(APP.Me.character, room);
+        room = getHiddenPassageDestination(room);
+    }
+
+    if (!isValidNeighbor(room, getMyLocation())) {
+        alert('Invalid move');
+        return false;
     } else {
+        updateCharacter(APP.Me.character, room);
         moveCharacter(APP.Me.character, room);
     }
 
