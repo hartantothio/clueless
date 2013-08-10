@@ -1,0 +1,14 @@
+
+rect:hover {
+    fill: #ccc;
+    cursor: pointer;
+}
+
+rect:hover text {
+    fill: #000;
+}
+
+rect[data-type="passage"]:hover {
+    fill: #000;
+}
+
