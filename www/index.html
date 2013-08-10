@@ -9,6 +9,7 @@
 <title>Clueless</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/jquery.fancybox.css" />
 <link rel="stylesheet" href="/css/style.css" />
 <body>
 
@@ -34,11 +35,23 @@
         </form>
     </div>
     <div class="clear"></div>
+    <ul class="menu">
+        <li id="#game-pad" data-toggle="modal">Detective Pad</li>
+        <li id="#game-accuse-suggest" data-toggle="modal">Suggest/Accuse</li>
+        <li id="#game-menu" data-toggle="modal">Menu</li>
+        <li id="#game-quit" data-toggle="modal">Quit</li>
+    </ul>
 </div>
+
+<div id="game_menu" class="modal">
+    <p>Game Menu</p>
+</div>
+
 
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
 <script src="/js/svg.min.js"></script>
 <script>

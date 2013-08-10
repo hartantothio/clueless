@@ -174,10 +174,10 @@ function displayDetectivePad() {
 } // displayDetectivePad()
 
 
-
+var $body = $('body');
 init();
 
-$('body').on('click', 'rect', function () {
+$body.on('click', 'rect', function () {
     var $this = $(this),
         type = $this.data('type'),
         room = $this.data('id');
@@ -196,43 +196,15 @@ $('body').on('click', 'rect', function () {
 
 });
 
+$body.on('click', '[data-toggle="modal"]', function () {
+return false;
+});
+
 
 
 
 
 /*
-function moveCharacter(character, target) {
-    var $target = $(target),
-        type = $target.data('type');
-
-    if (type === 'passage') {
-        type = 'room';
-        switch ($target.data('id')) {
-            case 'top-left':
-                target = 'kitchen';
-                break;
-            case 'top-right':
-                target = 'conservatory';
-                break;
-            case 'bottom-left':
-                target = 'lounge';
-                break;
-            case 'bottom-right':
-                target = 'study';
-                break;
-        }
-    }
-
-
-        case 'room':
-            break;
-        case 'hallway':
-            break;
-    }
-    APP.Char[character]animate(1000).move(x, y);
-} // moveCharacter()
-
-
 $(function () {
 
     $('body').on('click', 'rect', function () {
