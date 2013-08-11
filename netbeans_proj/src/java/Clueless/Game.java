@@ -20,21 +20,21 @@ public class Game {
    public final long Id;
    private String _playStyle, _name, _password;
    private Set<Card> _solution;
-   private Set<Player> _players;
+   private List<Player> _players;
    private Player _lastSuggestor;
+   private int _currentPlayer;
    
    public Game(long id, String playStyle, String name, String password){
       Id = id;
       _playStyle = playStyle;
       _name = name;
       _password = password;
-      _players = new HashSet<Player>(6);
+      _players = new ArrayList<Player>(6);
       _lastSuggestor = null;
-      generateSolution();
    }
    
    private void generateSolution(){
-      Random r = new Random();
+      Random r = new Random(System.currentTimeMillis());
       _solution.add((Card)GameManager.getCharacters().toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getWeapons().toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getRooms().toArray()[r.nextInt(9)]);
@@ -75,9 +75,25 @@ public class Game {
       return _password;
    }
    
+   /**
+    * @return the _lastSuggestor
+    */
+   public Player getLastSuggestor() {
+      return _lastSuggestor;
+   }
+
+   /**
+    * @param lastSuggestor the _lastSuggestor to set
+    */
+   public void setLastSuggestor(Player lastSuggestor) {
+      this._lastSuggestor = lastSuggestor;
+   }
+   
    public Set<Character> getAvailableCharacters(){
+      //Remember, <Random> should always be available
       Set<Character> available = GameManager.getCharacters();
       for(Player p : _players)
+         if(!p.getCharacter().getName().equals("<Random>"))
          available.remove(p.getCharacter());
       return available;
    }
@@ -102,11 +118,46 @@ public class Game {
          p.notify(notice, args);
    }
    
+   public void start(){
+      //Determine a turn order
+      List<Player> reorder = _players;
+      Random r = new Random(System.currentTimeMillis());
+      
+      _players.clear();
+      int i;
+      while(reorder.size() > 0){
+         i = r.nextInt(reorder.size());
+         _players.add(reorder.get(i));
+         reorder.remove(i);
+      }
+      _currentPlayer = 0;
+      
+      //Determine a solution
+      generateSolution();
+      
+      //Make sure there are no more "random" characters
+      Set<Character> available = getAvailableCharacters();
+      if(available.size() != 1){
+         available.remove(new Character("<Random>"));
+         for(Player p : _players)
+            if(p.getCharacter().getName().equals("<Random>")){
+               Iterator<Character> a = available.iterator();
+               p.setCharacter(a.next());
+               a.remove();
+            }
+      }
+      
+      //Notify for turn
+      List args = new ArrayList();
+      args.add(_players.get(_currentPlayer).getCharacter());
+      notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
+   }
+   
    public void processSuggestion(WsOutbound pConn, Character murderer,
            Room scene, Weapon weapon){
       //Determine the suggestor from the socket and remove them
       //from the list of possible disproving players
-      Set<Player> others = _players;
+      List<Player> others = _players;
       for(Player p : _players)
          if(p.getSocket() == pConn){
             _lastSuggestor = p;
@@ -148,7 +199,7 @@ public class Game {
       }
    }
    
-   public void playerAccuses(WsOutbound pConn, Character murderer, Room scene,
+   public void processAccusation(WsOutbound pConn, Character murderer, Room scene,
            Weapon weapon){
       //Notify all players
       List<Card> args = new ArrayList<Card>();
@@ -181,6 +232,21 @@ public class Game {
          accuser.setActive(false);
          _players.remove(accuser);
          _players.add(accuser);
+      }
+   }
+   
+   public void processEndTurn(Player p){
+      //Only the current player can end their turn
+      if(_players.indexOf(p) == _currentPlayer) {
+         List args = new ArrayList();
+         args.add(p.getCharacter());
+         notifyAllPlayers(NotificationEnum.PlayerEndTurn, args);
+         
+         if(++_currentPlayer > _players.size()) _currentPlayer = 0;
+         
+         args.clear();
+         args.add(_players.get(_currentPlayer).getCharacter());
+         notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
       }
    }
 }

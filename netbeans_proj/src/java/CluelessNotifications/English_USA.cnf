@@ -6,5 +6,7 @@ PlayerFailedToDisproveSuggestion | "No one could disprove \\s's suggestion",
 PlayerMadeAccusation             | "\\s accuses \\s of murder in the \\s with the \\s",
 PlayerAccusationCorrect          | "\\s's accusation is correct and has therefore solved the murder!",
 PlayerAccusationIncorrect        | "\\s's accusation is incorrect",
+PlayerEndTurn                    | "\\s ends their turn",
+PlayerGetTurn                    | "It is now \\s's turn",
 PlayerQuit                       | "\\s has left the game",
 PlayerChat                       | ""
