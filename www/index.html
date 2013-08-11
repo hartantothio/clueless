@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Clueless</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/jquery.fancybox.css" />
+<link rel="stylesheet" href="/css/style.css" />
+<body>
+
+<div id="container">
+    <div id="canvas"></div>
+    <div id="sidebar">
+        <div class="notification notification-system">
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+        </div>
+        <div class="notification">
+
+        </div>
+        <form method="post" action="">
+            <input type="text" name="message" />
+        </form>
+    </div>
+    <div class="clear"></div>
+    <ul class="menu">
+        <li id="#game-pad" data-toggle="modal">Detective Pad</li>
+        <li id="#game-accuse-suggest" data-toggle="modal">Suggest/Accuse</li>
+        <li id="#game-menu" data-toggle="modal">Menu</li>
+        <li id="#game-quit" data-toggle="modal">Quit</li>
+    </ul>
+</div>
+
+<div id="game_menu" class="modal">
+    <p>Game Menu</p>
+</div>
+
+
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.fancybox.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/svg.min.js"></script>
+<script>
+var APP = {};
+APP.Draw = SVG('canvas'); // my canvas object
+APP.Passages = {};
+APP.Hallways = {};
+APP.Characters = {};
+</script>
+<script src="/js/draw.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

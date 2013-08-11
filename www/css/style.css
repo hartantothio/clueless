@@ -1,0 +1,80 @@
+.clear {
+    clear: both;
+}
+
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+#canvas {
+    width: 460px;
+    height: 460px;
+    float: left;
+    margin-right: 20px;
+    /*border:1px solid #900;*/
+}
+
+#sidebar {
+    float: left;
+}
+
+#sidebar .notification {
+    width: 100%;
+    border: 1px solid #ccc;
+    overflow: scroll;
+    padding: 10px;
+    margin-bottom: 10px;
+    height: 180px;
+}
+
+#sidebar input {
+    margin: 0;
+    width: 100%;
+    padding: 5px;
+}
+
+#sidebar .notification p {
+    margin: 0 0 10px 0;
+    padding: 0 0 10px 0;
+    border-bottom: 1px dashed #ccc;
+}
+
+.menu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+}
+
+.menu li {
+    cursor: pointer;
+    border: 1px solid #000;
+    float: left;
+    padding: 15px;
+    margin-right: 20px;
+    background-color: #ccc;
+}
+
+.menu li:hover {
+    background-color: #666;
+    color: #fff;
+}
+
+.modal {
+    display: none;
+}
+
+rect:hover {
+    fill: #ccc;
+    cursor: pointer;
+}
+
+rect:hover text {
+    fill: #000;
+}
+
+rect[data-type="passage"]:hover {
+    fill: #000;
+}
+
