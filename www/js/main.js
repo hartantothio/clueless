@@ -174,7 +174,6 @@ function displayDetectivePad() {
 } // displayDetectivePad()
 
 
-var $body = $('body');
 init();
 
 $body.on('click', 'rect', function () {
@@ -196,8 +195,15 @@ $body.on('click', 'rect', function () {
 
 });
 
-$body.on('click', '[data-toggle="modal"]', function () {
-return false;
+/* suggest/accuse */
+$('#submit-suggest').on('click', function () {
+    alert('Continue with suggestion!');
+    return false;
+});
+
+$('#submit-accuse').on('click', function () {
+    alert('Continue with accusation!');
+    return false;
 });
 
 

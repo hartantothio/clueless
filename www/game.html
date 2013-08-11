@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Clueless</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/jquery.fancybox.css" />
+<link rel="stylesheet" href="/css/style.css" />
+<script>
+var ws = new WebSocket("ws://localhost:8080/TomcatWebSocket/wschat/WsChatServlet");
+ws.onopen = function(){
+};
+
+ws.onmessage = function(message){
+    document.getElementById("chatlog").textContent += message.data + "\n";
+};
+
+function postToServer(){
+    ws.send(document.getElementById("msg").value);
+    document.getElementById("msg").value = "";
+}
+
+function closeConnect(){
+    ws.close();
+}
+</script>
+<body>
+
+<div id="container">
+    <div id="canvas"></div>
+    <div id="sidebar">
+        <div class="notification notification-system">
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
+        </div>
+        <div class="notification">
+
+        </div>
+        <form method="post" action="">
+            <input type="text" name="message" />
+        </form>
+    </div>
+    <div class="clear"></div>
+    <ul class="menu">
+        <li><a href="#game-accuse-suggest" data-toggle="modal">Suggest/Accuse</a></li>
+        <li><a href="#game-menu" data-toggle="modal">Menu</a></li>
+        <li><a href="#game-quit" onclick="return confirm('Are you sure you want to quit?');">Quit</a></li>
+    </ul>
+</div>
+
+<div class="modal"><div id="game-pad">
+    <p>Detective Pad</p>
+</div></div>
+
+<div class="modal"><div id="game-menu" class="box">
+    <h2>Game Menu</h2>
+    <form action="" method="post">
+        <div class="control-group">
+            <label>Language: </label>
+            <div class="control">
+                <select name="language">
+                    <option value="English">English</option>
+               </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Sound: </label>
+            <div class="control">
+                <select name="sound">
+                    <option value="1">On</option>
+                    <option value="0">Off</option>
+               </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <ul class="menu">
+                <li><a href="#" class="modal-close">Back</a></li>
+            </ul>
+        </div>
+    </form>
+</div></div>
+
+<div class="modal"><div id="game-accuse-suggest" class="box">
+    <h2>Suggest/Accuse</h2>
+    <form action="" method="post">
+        <div class="control-group">
+            <label>Character: </label>
+            <div class="control">
+                <select name="character">
+                    <option value="Green">Green</option>
+                    <option value="Scarlet">Scarlet</option>
+                    <option value="Plum">Plum</option>
+                    <option value="Peacock">Peacock</option>
+                    <option value="White">White</option>
+                    <option value="Mustard">Mustard</option>
+               </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Weapon: </label>
+            <div class="control">
+                <select name="weapon">
+                    <option value="Rope">Rope</option>
+                    <option value="Lead Pipe">Lead Pipe</option>
+                    <option value="Knife">Knife</option>
+                    <option value="Wrench">Wrench</option>
+                    <option value="Candlestick">Candlestick</option>
+                    <option value="Revolver">Revolver</option>
+               </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Room: </label>
+            <div class="control">
+                <select name="room">
+                    <option value="Study">Study</option>
+                    <option value="Hall">Hall</option>
+                    <option value="Lounge">Lounge</option>
+                    <option value="Library">Library</option>
+                    <option value="Billiard Room">Billiard Room</option>
+                    <option value="Dining Room">Dining Room</option>
+                    <option value="Conservatory">Conservatory</option>
+                    <option value="Ballroom">Ballroom</option>
+                    <option value="Kitchen">Kitchen</option>
+               </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <ul class="menu">
+                <li><a href="#" class="modal-close">Back</a></li>
+                <li><a href="#" id="submit-suggest" class="submit">Suggest</a></li>
+                <li><a href="#" id="submit-accuse" class="submit">Accuse</a></li>
+            </ul>
+        </div>
+    </form>
+</div></div>
+
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.fancybox.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/svg.min.js"></script>
+<script>
+var APP = {};
+APP.Draw = SVG('canvas'); // my canvas object
+APP.Passages = {};
+APP.Hallways = {};
+APP.Characters = {};
+</script>
+<script src="/js/draw.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
