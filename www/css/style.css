@@ -2,9 +2,21 @@
     clear: both;
 }
 
+h2 {
+    margin: 10px 0;
+}
+
 .container {
     width: 100%;
     padding: 20px;
+}
+
+#page-main .menu {
+    width: 180px;
+}
+
+#page-main .menu a {
+    margin-bottom: 10px;
 }
 
 #canvas {
@@ -47,22 +59,31 @@
     overflow: hidden;
 }
 
-.menu li {
-    cursor: pointer;
+.menu li a {
     border: 1px solid #000;
     float: left;
-    padding: 15px;
+    padding: 5px 15px;
     margin-right: 20px;
     background-color: #ccc;
+    text-decoration: none;
 }
 
-.menu li:hover {
+.menu li a:hover {
     background-color: #666;
     color: #fff;
 }
 
 .modal {
     display: none;
+}
+
+#game-menu, #game-accuse-suggest,
+#settings {
+    width: 480px;
+}
+
+.form-actions {
+    margin: 20px 0;
 }
 
 rect:hover {

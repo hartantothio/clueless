@@ -13,55 +13,51 @@
 <link rel="stylesheet" href="/css/style.css" />
 <body>
 
+<h1>Clueless</h1>
+<h2>By Team Awareness</h2>
 <div id="container">
-    <div id="canvas"></div>
-    <div id="sidebar">
-        <div class="notification notification-system">
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-        </div>
-        <div class="notification">
-
-        </div>
-        <form method="post" action="">
-            <input type="text" name="message" />
-        </form>
+    <div id="page-main">
+        <ul class="menu">
+            <li><a href="/create.html">Create Game</a></li>
+            <li><a href="/join.html">Join Game</a></li>
+            <li><a href="#settings" data-toggle="modal">Settings</a></li>
+            <li><a href="/clueless.pdf" target="_blank">How To Play</a></li>
+        </ul>
     </div>
-    <div class="clear"></div>
-    <ul class="menu">
-        <li id="#game-pad" data-toggle="modal">Detective Pad</li>
-        <li id="#game-accuse-suggest" data-toggle="modal">Suggest/Accuse</li>
-        <li id="#game-menu" data-toggle="modal">Menu</li>
-        <li id="#game-quit" data-toggle="modal">Quit</li>
-    </ul>
 </div>
 
-<div id="game_menu" class="modal">
-    <p>Game Menu</p>
-</div>
-
+<div class="modal"><div id="settings" class="box">
+    <h2>Settings</h2>
+    <form action="" method="post">
+        <div class="control-group">
+            <label>Language: </label>
+            <div class="control">
+                <select name="language">
+                    <option value="English">English</option>
+               </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Sound: </label>
+            <div class="control">
+                <select name="sound">
+                    <option value="1">On</option>
+                    <option value="0">Off</option>
+               </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <ul class="menu">
+                <li><a href="#" class="modal-close">Back</a></li>
+            </ul>
+        </div>
+    </form>
+</div></div>
 
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
 <script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
-<script src="/js/svg.min.js"></script>
-<script>
-var APP = {};
-APP.Draw = SVG('canvas'); // my canvas object
-APP.Passages = {};
-APP.Hallways = {};
-APP.Characters = {};
-</script>
-<script src="/js/draw.js"></script>
-<script src="/js/main.js"></script>
 </body>
 </html>
