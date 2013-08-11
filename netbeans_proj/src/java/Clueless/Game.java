@@ -4,9 +4,13 @@
  */
 package Clueless;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import org.apache.catalina.websocket.WsOutbound;
 
 /**
  *
@@ -17,6 +21,7 @@ public class Game {
    private String _playStyle, _name, _password;
    private Set<Card> _solution;
    private Set<Player> _players;
+   private Player _lastSuggestor;
    
    public Game(long id, String playStyle, String name, String password){
       Id = id;
@@ -24,32 +29,15 @@ public class Game {
       _name = name;
       _password = password;
       _players = new HashSet<Player>(6);
+      _lastSuggestor = null;
       generateSolution();
    }
    
    private void generateSolution(){
-      Card[] deck = (Card[]) GameManager.getDeck().toArray();
       Random r = new Random();
-      
-      Card current;
-      
-      while(_solution.size() < 1){
-         current = deck[r.nextInt(deck.length)];
-         if(current instanceof Character)
-            _solution.add(current);
-      }
-      
-      while(_solution.size() < 2){
-         current = deck[r.nextInt(deck.length)];
-         if(current instanceof Room)
-            _solution.add(current);
-      }
-      
-      while(_solution.size() < 3){
-         current = deck[r.nextInt(deck.length)];
-         if(current instanceof Weapon)
-            _solution.add(current);
-      }
+      _solution.add((Card)GameManager.getCharacters().toArray()[r.nextInt(6)]);
+      _solution.add((Card)GameManager.getWeapons().toArray()[r.nextInt(6)]);
+      _solution.add((Card)GameManager.getRooms().toArray()[r.nextInt(9)]);
    }
 
    /**
@@ -85,5 +73,114 @@ public class Game {
     */
    public String getPassword() {
       return _password;
+   }
+   
+   public Set<Character> getAvailableCharacters(){
+      Set<Character> available = GameManager.getCharacters();
+      for(Player p : _players)
+         available.remove(p.getCharacter());
+      return available;
+   }
+   
+   public boolean addPlayer(Player p){
+      if(_players.size() > 5) return false;
+      p.setCharacter(getAvailableCharacters().iterator().next());
+      p.setActive(true);
+      p.setGame(this);
+      return _players.add(p);
+   }
+   
+   public boolean removePlayer(Player p){
+      List<Card> args = new ArrayList<Card>();
+      args.add(p.getCharacter());
+      notifyAllPlayers(NotificationEnum.PlayerQuit, args);
+      return _players.remove(p);
+   }
+   
+   public void notifyAllPlayers(NotificationEnum notice, List args){
+      for(Player p : _players)
+         p.notify(notice, args);
+   }
+   
+   public void processSuggestion(WsOutbound pConn, Character murderer,
+           Room scene, Weapon weapon){
+      //Determine the suggestor from the socket and remove them
+      //from the list of possible disproving players
+      Set<Player> others = _players;
+      for(Player p : _players)
+         if(p.getSocket() == pConn){
+            _lastSuggestor = p;
+            others.remove(p);
+         }
+      
+      //Notify everyone of the suggestion
+      List<Card> noticeArgs = new ArrayList<Card>();
+      noticeArgs.add(_lastSuggestor.getCharacter());
+      noticeArgs.add(murderer);
+      noticeArgs.add(scene);
+      noticeArgs.add(weapon);
+      notifyAllPlayers(NotificationEnum.PlayerMadeSuggestion, (List)noticeArgs);
+      
+      //Removing the suggestor leaves a set of the suggested clues
+      noticeArgs.remove(_lastSuggestor.getCharacter());
+      
+      //Determine if there is a player that can disprove the suggestion
+      Character disprover = null;
+      for(Player p : others){
+         if(disprover != null) break;
+         for(Iterator<Card> i = noticeArgs.iterator(); disprover == null && i.hasNext();)
+            if(p.getClues().contains(i.next())){
+               disprover = p.getCharacter();
+               p.notify(NotificationEnum.PlayerMustDisproveSuggestion, null);
+            }
+      }
+      
+      //Send out the appropriate notifications
+      noticeArgs.clear();
+      if(disprover != null){
+         noticeArgs.add(disprover);
+         noticeArgs.add(_lastSuggestor.getCharacter());
+         notifyAllPlayers(NotificationEnum.PlayerDisprovedSuggestion, (List)noticeArgs);
+      }
+      else{
+         noticeArgs.add(_lastSuggestor.getCharacter());
+         notifyAllPlayers(NotificationEnum.PlayerFailedToDisproveSuggestion, (List)noticeArgs);
+      }
+   }
+   
+   public void playerAccuses(WsOutbound pConn, Character murderer, Room scene,
+           Weapon weapon){
+      //Notify all players
+      List<Card> args = new ArrayList<Card>();
+      Player accuser = null;
+      for(Player p : _players)
+         if(p.getSocket() == pConn){
+            accuser = p;
+            break;
+         }
+      //This 'if' should never happen, but if not here, Netbeans gives a warning
+      //that .getCharacters may be called on a null object
+      if(accuser == null) return;
+      args.add(accuser.getCharacter());
+      args.add(murderer);
+      args.add(scene);
+      args.add(weapon);
+      notifyAllPlayers(NotificationEnum.PlayerMadeAccusation, args);
+      
+      //Determine if the accusation was correct and act appropriately
+      args.remove(accuser.getCharacter());
+      if(_solution.containsAll(args)){
+         args.clear();
+         args.add(accuser.getCharacter());
+         notifyAllPlayers(NotificationEnum.PlayerAccusationCorrect, args);
+      }
+      else{
+         args.clear();
+         args.add(accuser.getCharacter());
+         notifyAllPlayers(NotificationEnum.PlayerAccusationIncorrect, args);
+         accuser.setActive(false);
+         _players.remove(accuser);
+         _players.add(accuser);
+      }
    }
 }

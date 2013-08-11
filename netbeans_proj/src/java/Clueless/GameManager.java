@@ -19,42 +19,44 @@ public class GameManager {
    private static GameManager _me;
    
    private final Object _gamesLock;
-   private Map<Integer, Game> _games;
-   private Set<Location> _board;
-   private static Set<Card> _deck;
+   private static Set<Room> _rooms;
+   private static Set<Hall> _halls;
+   private static Set<Character> _characters;
+   private static Set<Weapon> _weapons;
+   private Map<Long, Game> _games;
    private long _caseNumber;
    
    private GameManager(){
       _gamesLock = new Object();
-      _games = new HashMap<Integer, Game>(MAX_GAMES);
-      _board = new HashSet<Location>();
-      _deck = new HashSet<Card>();
+      _games = new HashMap<Long, Game>(MAX_GAMES);
+      _rooms = new HashSet<Room>();
+      _halls = new HashSet<Hall>();
+      _characters = new HashSet<Character>();
+      _weapons = new HashSet<Weapon>();
       _caseNumber = 1;
       makeDeck();
    }
    
    private void makeDeck(){
       //Characters
-      getDeck().add(new Character("Miss Scarlet"));
-      getDeck().add(new Character("Colonel Mustard"));
-      getDeck().add(new Character("Ms. Peacock"));
-      getDeck().add(new Character("Professor Plum"));
-      getDeck().add(new Character("Mrs. White"));
-      getDeck().add(new Character("Mr. Green"));
+      _characters.add(new Character("Miss Scarlet"));
+      _characters.add(new Character("Colonel Mustard"));
+      _characters.add(new Character("Ms. Peacock"));
+      _characters.add(new Character("Professor Plum"));
+      _characters.add(new Character("Mrs. White"));
+      _characters.add(new Character("Mr. Green"));
+      _characters.add(new Character("<Random>"));
       
       //Weapons
-      getDeck().add(new Weapon("Revolver"));
-      getDeck().add(new Weapon("Knife"));
-      getDeck().add(new Weapon("Lead Pipe"));
-      getDeck().add(new Weapon("Wrench"));
-      getDeck().add(new Weapon("Candlestick"));
-      getDeck().add(new Weapon("Rope"));
+      _weapons.add(new Weapon("Revolver"));
+      _weapons.add(new Weapon("Knife"));
+      _weapons.add(new Weapon("Lead Pipe"));
+      _weapons.add(new Weapon("Wrench"));
+      _weapons.add(new Weapon("Candlestick"));
+      _weapons.add(new Weapon("Rope"));
       
       //Rooms
       createBoard();
-      for(Location l : _board)
-         if(l instanceof Room)
-            getDeck().add(l);
    }
    
    private void createBoard(){
@@ -98,7 +100,10 @@ public class GameManager {
                      neighbors.add(board[0][0]);
                
                board[i][j].setNeighbors(neighbors);
-               _board.add(board[i][j]);
+               if(board[i][j] instanceof Room)
+                  _rooms.add((Room)board[i][j]);
+               else
+                  _halls.add((Hall)board[i][j]);
             }
          }
    }
@@ -109,10 +114,15 @@ public class GameManager {
    }
    
    public long createGame(String playStyle, String name, String password,
-           WsOutbound playerSoc){
+           WsOutbound playerSoc, String playerLang){
       if(name.equals("")) name = "Case #" + _caseNumber;
       Game g = new Game(_caseNumber++, playStyle, name, password);
-      //TODO: Player constructor
+      Player p = new Player(playerSoc, playerLang);
+      g.addPlayer(p);
+      synchronized(_gamesLock){
+         _games.put((Long)g.Id, g);
+      }
+      return g.Id;
    }
    
    public Set<Game> queryGames(String playStyle, boolean secured){
@@ -127,20 +137,44 @@ public class GameManager {
       return retVal;
    }
    
-   public boolean joinGame(){
-      
+   public boolean joinGame(WsOutbound playerSoc, String playerLang, Long gameId){
+      boolean retVal = false;
+      Player p = new Player(playerSoc, playerLang);
+      synchronized(_gamesLock){
+         if(_games.get(gameId) != null)
+            retVal = _games.get(gameId).addPlayer(p);
+      }
+      return retVal;
    }
    
-   public void deleteGame(Integer gameId){
+   public void deleteGame(Long gameId){
       synchronized(_gamesLock){
          _games.remove(gameId);
       }
    }
 
    /**
-    * @return the _deck
+    * @return the _board
     */
-   public static Set<Card> getDeck() {
-      return _deck;
+   public static Set<Room> getRooms() {
+      return _rooms;
+   }
+   
+   public static Set<Hall> getHalls(){
+      return _halls;
+   }
+   
+   public static Set<Location> getBoard(){
+      Set<Location> board = new HashSet<Location>(_rooms);
+      board.addAll(_halls);
+      return board;
+   }
+   
+   public static Set<Character> getCharacters(){
+      return _characters;
+   }
+   
+   public static Set<Weapon> getWeapons(){
+      return _weapons;
    }
 }
