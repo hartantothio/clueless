@@ -19,4 +19,22 @@ public abstract class Card {
    public String getName(){
       return name;
    }
+   
+   @Override
+   public String toString(){
+      return name;
+   }
+   
+   @Override
+   public boolean equals(Object o){
+      boolean retVal = false;
+      if(o instanceof Card)
+         retVal = name.equals(((Card)o).getName());
+      return retVal;
+   }
+   
+   @Override
+   public int hashCode(){
+      return super.hashCode();
+   }
 }

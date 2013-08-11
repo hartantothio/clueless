@@ -17,6 +17,8 @@ public enum NotificationEnum {
    PlayerMadeAccusation,
    PlayerAccusationCorrect,
    PlayerAccusationIncorrect,
+   PlayerEndTurn,
+   PlayerGetTurn,
    PlayerQuit,
    PlayerChat
 }

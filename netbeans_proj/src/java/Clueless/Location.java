@@ -37,4 +37,17 @@ public abstract class Location extends Card {
    public boolean isValidNeighbor(Location loc){
       return neighbors.contains(loc);
    }
+   
+   @Override
+   public boolean equals(Object o){
+      boolean retVal = false;
+      if(o instanceof Location)
+         retVal = super.equals(o) && position.equals(((Location)o).getCoordinate());
+      return retVal;
+   }
+   
+   @Override
+   public int hashCode(){
+      return super.hashCode();
+   }
 }
