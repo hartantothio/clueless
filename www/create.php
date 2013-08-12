@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Clueless</title>
-<meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/css/jquery.fancybox.css" />
-<link rel="stylesheet" href="/css/style.css" />
-<body>
+<?php
+
+if (isset($_POST['submit'])) {
+    $id = md5($_POST['server']);
+    header('Location: /pregame.php?id=' . $id);
+}
+
+?>
+<?php include('header.php'); ?>
 
 <h1>Clueless</h1>
 <h2>By Team Awareness</h2>
@@ -40,11 +35,12 @@
                     <input type="password" name="password" value="" />
                 </div>
             </div>
-        </form><br />
-        <ul class="menu">
-            <li><a href="/index.html">Main Menu</a></li>
-            <li><a href="/pregame.html?id=123">Next</a></li>
-        </ul>
+            <br />
+            <ul class="menu">
+                <li><a href="/">Main Menu</a></li>
+                <li><input type="submit" name="submit" value="Next" /></li>
+            </ul>
+        </form>
     </div>
 </div>
 
@@ -55,3 +51,8 @@
 <script src="/js/plugin.js"></script>
 </body>
 </html>
+
+
+
+
+

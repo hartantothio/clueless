@@ -59,16 +59,18 @@ h2 {
     overflow: hidden;
 }
 
-.menu li a {
+.menu li a, .menu li input {
     border: 1px solid #000;
     float: left;
     padding: 5px 15px;
     margin-right: 20px;
     background-color: #ccc;
     text-decoration: none;
+    color: #000;
+    cursor: pointer;
 }
 
-.menu li a:hover {
+.menu li a:hover, .menu li input:hover {
     background-color: #666;
     color: #fff;
 }

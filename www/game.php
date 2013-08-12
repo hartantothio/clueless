@@ -11,41 +11,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/css/jquery.fancybox.css" />
 <link rel="stylesheet" href="/css/style.css" />
-<script>
-/*
-var ws = new WebSocket("ws://localhost:8080/TomcatWebSocket/wschat/WsChatServlet");
-ws.onopen = function(){
-};
-
-ws.onmessage = function(message){
-    document.getElementById("chatlog").textContent += message.data + "\n";
-};
-
-function postToServer(){
-    ws.send(document.getElementById("msg").value);
-    document.getElementById("msg").value = "";
-}
-
-function closeConnect(){
-    ws.close();
-}
-*/
-</script>
 <body>
 
 <div id="container">
     <div id="canvas"></div>
-    <div id="sidebar">
+    <div id="sidebar" style="width: 500px;">
         <div class="notification notification-system">
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
         </div>
         <div class="notification">
 
@@ -98,15 +69,40 @@ function closeConnect(){
     <h2>Suggest/Accuse</h2>
     <form action="" method="post">
         <div class="control-group">
+            <label>Action: </label>
+            <div class="control">
+                <select name="action">
+                    <option value="suggest">Suggest</option>
+                    <option value="accuse">Accuse</option>
+               </select>
+            </div>
+        </div>
+        <div class="control-group">
             <label>Character: </label>
             <div class="control">
                 <select name="character">
-                    <option value="Green">Green</option>
-                    <option value="Scarlet">Scarlet</option>
-                    <option value="Plum">Plum</option>
-                    <option value="Peacock">Peacock</option>
-                    <option value="White">White</option>
-                    <option value="Mustard">Mustard</option>
+                    <option value="Green">Mr. Green</option>
+                    <option value="Scarlet">Miss Scarlet</option>
+                    <option value="Plum">Professor Plum</option>
+                    <option value="Peacock">Mrs. Peacock</option>
+                    <option value="White">Mrs. White</option>
+                    <option value="Mustard">Colonel Mustard</option>
+               </select>
+            </div>
+        </div>
+        <div class="control-group room">
+            <label>Room: </label>
+            <div class="control">
+                <select name="room">
+                    <option value="Study">Study</option>
+                    <option value="Hall">Hall</option>
+                    <option value="Lounge">Lounge</option>
+                    <option value="Library">Library</option>
+                    <option value="Billiard Room">Billiard Room</option>
+                    <option value="Dining Room">Dining Room</option>
+                    <option value="Conservatory">Conservatory</option>
+                    <option value="Ballroom">Ballroom</option>
+                    <option value="Kitchen">Kitchen</option>
                </select>
             </div>
         </div>
@@ -123,27 +119,10 @@ function closeConnect(){
                </select>
             </div>
         </div>
-        <div class="control-group">
-            <label>Room: </label>
-            <div class="control">
-                <select name="room">
-                    <option value="Study">Study</option>
-                    <option value="Hall">Hall</option>
-                    <option value="Lounge">Lounge</option>
-                    <option value="Library">Library</option>
-                    <option value="Billiard Room">Billiard Room</option>
-                    <option value="Dining Room">Dining Room</option>
-                    <option value="Conservatory">Conservatory</option>
-                    <option value="Ballroom">Ballroom</option>
-                    <option value="Kitchen">Kitchen</option>
-               </select>
-            </div>
-        </div>
         <div class="form-actions">
             <ul class="menu">
                 <li><a href="#" class="modal-close">Back</a></li>
-                <li><a href="#" id="submit-suggest" class="submit">Suggest</a></li>
-                <li><a href="#" id="submit-accuse" class="submit">Accuse</a></li>
+                <li><input type="submit" value="Submit" name="submit" /></li>
             </ul>
         </div>
     </form>
@@ -157,6 +136,11 @@ function closeConnect(){
 <script src="/js/svg.min.js"></script>
 <script>
 var APP = {};
+APP.Solution = {
+    player: 'green',
+    weapon: 'rope',
+    room: 'study'
+};
 APP.Draw = SVG('canvas'); // my canvas object
 APP.Passages = {};
 APP.Hallways = {};

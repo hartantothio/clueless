@@ -30,10 +30,10 @@ function init() {
         character: 'Plum',
     };
 
-    moveCharacter('Plum', APP.Me.location);
+    moveCharacter('Plum', APP.Me.location, true);
 
     for (var key in APP.Players) {
-        moveCharacter(key, APP.Players[key].location);
+        moveCharacter(key, APP.Players[key].location, true);
     }
 
 } // init()
@@ -89,7 +89,7 @@ function isValidNeighbor(location1, location2) {
     return index >= 0;
 } // isValidNeighbor()
 
-function moveCharacter(character, target) {
+function moveCharacter(character, target, initial) {
     var total_people = 0, remainder = null,
         x = 0, y = 0;
 
@@ -98,6 +98,14 @@ function moveCharacter(character, target) {
 
         // calculate the offset
         total_people = APP.Rooms[target]['people'].length;
+        if (initial === undefined && target === APP.Players[character].location) {
+            APP.Rooms[target].people.splice(
+                APP.Rooms[target].people.indexOf(character),
+                1
+            );
+            total_people--;
+        }
+
         if (total_people < 3) {
             x += (total_people * 25);
         } else {
@@ -113,6 +121,14 @@ function moveCharacter(character, target) {
 
         // calculate the offset
         total_people = APP.Hallways.Horizontal[target]['people'].length;
+        if (initial === undefined && target === APP.Players[character].location) {
+            APP.Hallways.Horizontal[target].people.splice(
+                APP.Hallways.Horizontal[target].people.indexOf(character),
+                1
+            );
+            total_people--;
+        }
+
         if (total_people < 3) {
             x += (total_people * 20);
         } else {
@@ -126,6 +142,14 @@ function moveCharacter(character, target) {
     } else if (APP.Hallways.Vertical[target]) {
         // calculate the offset
         total_people = APP.Hallways.Vertical[target]['people'].length;
+        if (initial === undefined && target === APP.Players[character].location) {
+            APP.Hallways.Vertical[target].people.splice(
+                APP.Hallways.Vertical[target].people.indexOf(character),
+                1
+            );
+            total_people--;
+        }
+
         total_people = parseInt(total_people / 2, 10);
         y = 3 + (total_people * 20);
         x = (APP.Hallways.Vertical[target]['people'].length % 2 === 1) ? 15 : 3;
@@ -189,29 +213,71 @@ $body.on('click', 'rect', function () {
         alert('Invalid move');
         return false;
     } else {
-        updateCharacter(APP.Me.character, room);
         moveCharacter(APP.Me.character, room);
+        updateCharacter(APP.Me.character, room);
     }
 
 });
 
 /* suggest/accuse */
-var $game_accuse_suggest = $('#game-accuse-suggest');
-$body.on('click', '#submit-suggest', function () {
-    var character = $('#game-accuse-suggest').find('select[name="character"] :selected').text(),
-        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
-        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
-    return confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon);
-});
+$body.on('submit', '#game-accuse-suggest form', function () {
+    var $this = $(this),
+        action = $this.find('select[name="action"]').val(),
+        short_character = $this.find('select[name="character"]').val(),
+        long_character = $this.find('select[name="character"] option:selected').text(),
+        room = null;
+        weapon = $this.find('select[name="weapon"]').val();
 
-$body.on('click', '#submit-accuse', function () {
+    if (action === 'suggest') {
+        room = APP.Players[APP.Me.character].location;
+        if (confirm('Suggest ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
+            moveCharacter(short_character, APP.Players[APP.Me.character].location);
+            var date = new Date(),
+                str = date.getHours() + ':' + date.getMinutes();
+            $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon + '.</p>');
+            $.fancybox.close();
+            setTimeout(function () {
+                short_character = short_character.toLowerCase();
+                room = room.toLowerCase();
+                weapon = weapon.toLowerCase();
+
+                if (short_character !== APP.Solution.player) {
+                    var date = new Date(),
+                        str = date.getHours() + ':' + date.getMinutes();
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Mrs. White disproved Professor Plum\'s suggestion.');
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Mrs. White disproved your suggestion using the <b>' + long_character + '</b> clue card.</p>');
+                } else if (room !== APP.Solution.room) {
+                    var date = new Date(),
+                        str = date.getHours() + ':' + date.getMinutes();
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Miss Scarlet disproved Professor Plum\'s suggestion.');
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Miss Scarlet disproved your suggestion using the <b>' + room + '</b> clue card.</p>');
+                } else if (weapon !== APP.Solution.weapon) {
+                    var date = new Date(),
+                        str = date.getHours() + ':' + date.getMinutes();
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Colonel Mustard disproved Professor Plum\'s suggestion.');
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Colonel Mustard disproved your suggestion using the <b>' + weapon + '</b> clue card.</p>');
+                } else {
+                    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - Nobody can disproved the suggestion.</p>');
+                }
+            }, 4000);
+        } else {
+
+        }
+    } else {
+        room = $this.find('select[name="room"]').val();
+    }
+
     return false;
-    var character = $game_accuse_suggest.find('select[name="character"] option:selected').text(),
-        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
-        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
-
-    return confirm('Accuse ' + character + ' of murder in the ' + room + ' with the ' + weapon);
 });
+
+$body.on('change', 'select[name="action"]', function () {
+    if (this.value === 'accuse') {
+        $('#game-accuse-suggest .room').show();
+    } else {
+        $('#game-accuse-suggest .room').hide();
+    }
+});
+$('select[name="action"]').change();
 
 
 

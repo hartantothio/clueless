@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Clueless</title>
-<meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/css/jquery.fancybox.css" />
-<link rel="stylesheet" href="/css/style.css" />
-<body>
+<?php include('header.php'); ?>
 
 <h1>Clueless</h1>
 <h2>By Team Awareness</h2>
@@ -38,26 +25,26 @@
                 <th>Style</th>
             </tr>
             <tr>
-                <td><a href="/pregame.html?id=123">&laquo; Server Name &raquo;</a></td>
+                <td><a href="/pregame.php?id=123">&laquo; Server Name &raquo;</a></td>
                 <td>(1/6)</td>
                 <td>N</td>
                 <td>C</td>
             </tr>
             <tr>
-                <td><a href="/pregame.html?id=123">&laquo; Server Name &raquo;</a></td>
+                <td><a href="/pregame.php?id=123">&laquo; Server Name &raquo;</a></td>
                 <td>(1/6)</td>
                 <td>N</td>
                 <td>C</td>
             </tr>
             <tr>
-                <td><a href="/pregame.html?id=123">&laquo; Server Name &raquo;</a></td>
+                <td><a href="/pregame.php?id=123">&laquo; Server Name &raquo;</a></td>
                 <td>(1/6)</td>
                 <td>N</td>
                 <td>C</td>
             </tr>
         </table><br />
         <ul class="menu">
-            <li><a href="/index.html">Main Menu</a></li>
+            <li><a href="/">Main Menu</a></li>
         </ul>
     </div>
 </div>
@@ -69,3 +56,8 @@
 <script src="/js/plugin.js"></script>
 </body>
 </html>
+
+
+
+
+
