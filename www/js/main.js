@@ -196,14 +196,21 @@ $body.on('click', 'rect', function () {
 });
 
 /* suggest/accuse */
-$('#submit-suggest').on('click', function () {
-    alert('Continue with suggestion!');
-    return false;
+var $game_accuse_suggest = $('#game-accuse-suggest');
+$body.on('click', '#submit-suggest', function () {
+    var character = $('#game-accuse-suggest').find('select[name="character"] :selected').text(),
+        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
+        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
+    return confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon);
 });
 
-$('#submit-accuse').on('click', function () {
-    alert('Continue with accusation!');
+$body.on('click', '#submit-accuse', function () {
     return false;
+    var character = $game_accuse_suggest.find('select[name="character"] option:selected').text(),
+        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
+        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
+
+    return confirm('Accuse ' + character + ' of murder in the ' + room + ' with the ' + weapon);
 });
 
 
