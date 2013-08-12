@@ -13,6 +13,7 @@ public enum NotificationEnum {
    PlayerMadeSuggestion,
    PlayerMustDisproveSuggestion,
    PlayerDisprovedSuggestion,
+   PlayerDisprovedSuggestionWithClue,
    PlayerFailedToDisproveSuggestion,
    PlayerMadeAccusation,
    PlayerAccusationCorrect,
@@ -20,5 +21,8 @@ public enum NotificationEnum {
    PlayerEndTurn,
    PlayerGetTurn,
    PlayerQuit,
-   PlayerChat
+   PlayerChat,
+   GMCreateGame,
+   GMQueryGames,
+   GMJoinGame
 }

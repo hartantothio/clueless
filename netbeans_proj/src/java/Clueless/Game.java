@@ -5,7 +5,6 @@
 package Clueless;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -114,8 +113,13 @@ public class Game {
    }
    
    public void notifyAllPlayers(NotificationEnum notice, List args){
-      for(Player p : _players)
-         p.notify(notice, args);
+      if(notice == NotificationEnum.PlayerDisprovedSuggestion){
+         _lastSuggestor.notify(NotificationEnum.PlayerDisprovedSuggestionWithClue, args);
+         _lastSuggestor = null;
+      }
+      else
+         for(Player p : _players)
+            p.notify(notice, args);
    }
    
    public void start(){

@@ -115,7 +115,7 @@ public class Player {
             msg = msg.replace("\\s", arg.toString());
 
       try{
-      _clientSocket.writeTextMessage(CharBuffer.wrap(notice.toString() + "|" + msg));
+      _clientSocket.writeTextMessage(CharBuffer.wrap(notice.toString() + "\n" + msg));
       }
       catch(IOException iox){
          System.out.println(iox);

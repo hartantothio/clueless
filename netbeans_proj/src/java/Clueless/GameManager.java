@@ -113,7 +113,7 @@ public class GameManager {
       return _me;
    }
    
-   public long createGame(String playStyle, String name, String password,
+   public Long createGame(String playStyle, String name, String password,
            WsOutbound playerSoc, String playerLang){
       if(name.equals("")) name = "Case #" + _caseNumber;
       Game g = new Game(_caseNumber++, playStyle, name, password);
@@ -125,12 +125,13 @@ public class GameManager {
       return g.Id;
    }
    
-   public Set<Game> queryGames(String playStyle, boolean secured){
+   public Set<Game> queryGames(String playStyle, Boolean secured){
       Set<Game> retVal = new HashSet<Game>();
       
       synchronized(_gamesLock){
       for(Game g : _games.values())
-         if(g.getPlayStyle().equals(playStyle) && g.getPassword().equals("") != secured)
+         if((playStyle.equals("") || g.getPlayStyle().equals(playStyle)) &&
+                 (secured == null || g.getPassword().equals("") != secured))
             retVal.add(g);
       }
       
