@@ -4,6 +4,13 @@ $id = $_GET['id'];
 $server = '';
 if ($id == md5('test')) {
     $server = 'test';
+    $title = ' - test';
+} else if ($id == '098f6bcd4621d374cade4e832627b4f6') { // second player join the game
+    $server = 'test';
+    $title = ' - test';
+} else if ($id == md5('test2')) {
+    $server = 'test2';
+    $title = ' - test2';
 }
 
 ?>
@@ -22,18 +29,61 @@ if ($id == md5('test')) {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td><select id="character" name="character">
-                        <option value="Professor Plum">Professor Plum</option>
-                        <option value="Colonel Mustard">Colonel Mustard</option>
-                        <option value="Mr. Green">Mr. Green</option>
-                        <option value="Mrs. Peacock">Mrs. Peacock</option>
-                        <option value="Mrs. White">Mrs. White</option>
-                        <option value="Miss Scarlet">Miss Scarlet</option>
-                        <option value="Random">Random</option>
-                    </select></td>
-                </tr>
+                <?php if ($id == md5('test')) { ?>
+                    <tr>
+                        <td>1</td>
+                        <td><select id="character" name="character">
+                            <option value="Professor Plum">Professor Plum</option>
+                            <option value="Colonel Mustard">Colonel Mustard</option>
+                            <option value="Mr. Green">Mr. Green</option>
+                            <option value="Mrs. Peacock">Mrs. Peacock</option>
+                            <option value="Mrs. White">Mrs. White</option>
+                            <option value="Miss Scarlet">Miss Scarlet</option>
+                            <option value="Random">Random</option>
+                        </select></td>
+                    </tr>
+                <?php } else if ($id == '098f6bcd4621d374cade4e832627b4f6') { ?>
+                    <tr>
+                        <td>1</td>
+                        <td><select id="character" name="character">
+                            <option value="Miss Scarlet">Miss Scarlet</option>
+                            <option value="Random">Random</option>
+                        </select></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Professor Plum</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Colonel Mustard</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Mr. Green</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Mrs. Peacock</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Mrs. White</td>
+                    </tr>
+                <?php } else if ($id == md5('test2')) { ?>
+                    <tr>
+                        <td>1</td>
+                        <td><select id="character" name="character">
+                            <option value="Professor Plum">Professor Plum</option>
+                            <option value="Colonel Mustard">Colonel Mustard</option>
+                            <option value="Mr. Green">Mr. Green</option>
+                            <option value="Mrs. Peacock">Mrs. Peacock</option>
+                            <option value="Mrs. White">Mrs. White</option>
+                            <option value="Miss Scarlet">Miss Scarlet</option>
+                            <option value="Random">Random</option>
+                        </select></td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table><br />
         <ul class="menu">
@@ -49,8 +99,21 @@ if ($id == md5('test')) {
 <script src="/js/plugin.js"></script>
 <script>
 <?php
-if ($server == 'test') {
+if ($id == md5('test')) {
     ?>
+
+    var $table = $('#table tbody'),
+        _zzz = 0;
+
+    $(window).on('focus', function () {
+        if (_zzz === 0) {
+            $table.append('<tr><td>6</td><td>Miss Scarlet</td></tr>');
+            $('.menu').append('<li><a href="/game.php?id=<?php echo $id; ?>">Play!</a></li>');
+            _zzz = 1
+        }
+        return false;
+    });
+
     var players = [
         {
             num: '2',
@@ -60,26 +123,20 @@ if ($server == 'test') {
         {
             num: '3',
             name: 'Mr. Green',
-            ts: 5000
+            ts: 2100
         },
         {
             num: '4',
             name: 'Mrs. Peacock',
-            ts: 10000
+            ts: 5000
         },
         {
             num: '5',
             name: 'Mrs. White',
-            ts: 12000
-        },
-        {
-            num: '6',
-            name: 'Miss Scarlet',
-            ts: 13000
+            ts: 6000
         }
     ];
 
-    var $table = $('#table tbody');
     for (var i = 0; i < players.length; i++) {
         (function(index) {
             var num  = players[index]['num'],
@@ -89,12 +146,22 @@ if ($server == 'test') {
             setTimeout(function () {
                 $table.append('<tr><td>' + num + '</td><td>' + name + '</td></tr>');
                 $('#character').find('option[value="' + name + '"]').remove();
-                if (num == '6') {
-                    $('.menu').append('<li><a href="/game.php?id=<?php echo $id; ?>">Play!</a></li>');
-                }
             }, ts);
         })(i);
     }
+    <?php
+} else if ($id == '098f6bcd4621d374cade4e832627b4f6') {
+    ?>
+
+    var _zzz = 0;
+
+    $(window).on('focus', function () {
+        if (_zzz === 0) {
+            window.location = '/game.php?id=098f6bcd4621d374cade4e832627b4f6';
+            _zzz = 1;
+        }
+        return false;
+    })
     <?php
 }
 ?>

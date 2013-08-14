@@ -25,22 +25,10 @@
                 <th>Style</th>
             </tr>
             <tr>
-                <td><a href="/pregame.php?id=123">&laquo; Server Name &raquo;</a></td>
-                <td>(1/6)</td>
-                <td>N</td>
-                <td>C</td>
-            </tr>
-            <tr>
-                <td><a href="/pregame.php?id=123">&laquo; Server Name &raquo;</a></td>
-                <td>(1/6)</td>
-                <td>N</td>
-                <td>C</td>
-            </tr>
-            <tr>
-                <td><a href="/pregame.php?id=123">&laquo; Server Name &raquo;</a></td>
-                <td>(1/6)</td>
-                <td>N</td>
-                <td>C</td>
+                <td><a href="/pregame.php?id=098f6bcd4621d374cade4e832627b4f6">&laquo; test &raquo;</a></td>
+                <td>(5/6)</td>
+                <td>No</td>
+                <td>Casual</td>
             </tr>
         </table><br />
         <ul class="menu">
@@ -54,6 +42,19 @@
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
 <script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
+<script>
+$(function () {
+    var _zzz = 0;
+
+    $(window).on('focus', function () {
+        if (_zzz === 0) {
+            $('table').append('<tr><td><a href="/pregame.php?id=ad0234829205b9033196ba818f7a872b" onclick="return prompt(\'Enter Password\') == \'12345\';">&laquo; test2 &raquo;</a></td><td>(1/6)</td><td>Yes</td><td>Serious</td></tr>');
+            _zzz = 1;
+        }
+        return false;
+    });
+});
+</script>
 </body>
 </html>
 

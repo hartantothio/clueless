@@ -7,7 +7,7 @@ function init() {
 
     APP.Players = {
         'Plum': {
-            location: 'ballroom'
+            location: 'hallway11'
         },
         'Green': {
             location: 'study'
@@ -265,6 +265,16 @@ $body.on('submit', '#game-accuse-suggest form', function () {
         }
     } else {
         room = $this.find('select[name="room"]').val();
+        if (confirm('Accuse ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
+            short_character = short_character.toLowerCase();
+            room = room.toLowerCase();
+            weapon = weapon.toLowerCase();
+            if (short_character === APP.Solution.player && room === APP.Solution.room && weapon === APP.Solution.weapon) {
+                alert("Congratulations! You've solved the mystery.");
+            } else {
+                alert("Sorry, you made the wrong accusation.");
+            }
+        }
     }
 
     return false;
