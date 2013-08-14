@@ -53,46 +53,6 @@ public class CluelessServlet extends WebSocketServlet{
         @Override
         public void onTextMessage(CharBuffer cb) throws IOException{
            JsonReader jr = new JsonReader(new StringReader(cb.toString()));
-           /*Scanner in = new Scanner(cb);
-           in.useDelimiter("\n");
-           
-           String cmd = in.next();
-           if(cmd.equals("GMCreateGame")){
-              this.myoutbound.writeTextMessage(CharBuffer.wrap(
-                      GameManager.getInstance().createGame(in.next(), in.next(),
-                      in.next(), myoutbound, in.next()).toString()));
-           }
-           else if(cmd.equals("GMQueryGames")){
-              String style = in.next(), 
-           }
-           else if(cmd.equals("GMJoinGame")){
-              
-           }
-           else if(cmd.equals("PlayerMoved")){
-              
-           }
-           else if(cmd.equals("PlayerMadeSuggestion")){
-              
-           }
-           else if(cmd.equals("PlayerDisprovedSuggestion")){
-              
-           }
-           else if(cmd.equals("PlayerMadeAccusation")){
-              
-           }
-           else if(cmd.equals("PlayerEndTurn")){
-              
-           }
-           else if(cmd.equals("PlayerChat")){
-              
-           }
-           else if(cmd.equals("PlayerQuit")){
-              
-           }
-           else{
-              this.myoutbound.writeTextMessage(CharBuffer.wrap("ERROR Unregcognized command"));
-              System.out.println("ERROR Unrecognized command: " + cmd);
-           }*/
         }
 
         @Override

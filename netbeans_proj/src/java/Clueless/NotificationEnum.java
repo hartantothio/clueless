@@ -22,6 +22,7 @@ public enum NotificationEnum {
    PlayerGetTurn,
    PlayerQuit,
    PlayerChat,
+   PlayerChangedLanguage,
    GMCreateGame,
    GMQueryGames,
    GMJoinGame
