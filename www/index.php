@@ -1,6 +1,6 @@
 <?php
 
-if (!isset($_POST)) {
+if (!isset($_POST['language'])) {
     $lang = 'english';
 } else if ($_POST['language'] == 'English' || $_POST['language'] == 'Bahasa Inggris') {
     $lang = 'english';
