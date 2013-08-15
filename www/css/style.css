@@ -86,6 +86,11 @@ h2 {
     margin: 20px 0;
 }
 
+rect.active {
+    fill: #ccc;
+}
+
+/*
 rect:hover {
     fill: #ccc;
     cursor: pointer;
@@ -98,4 +103,4 @@ rect:hover text {
 rect[data-type="passage"]:hover {
     fill: #000;
 }
-
+*/

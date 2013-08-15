@@ -1,5 +1,31 @@
 /*global $, jQuery, window, console, APP*/
 
+// utility functions
+function disableMove() {
+    APP.Me.can_move = false;
+} // disableMove()
+
+function enableMove() {
+    APP.Me.can_move = true;
+} // enableMove()
+
+function disableSuggest() {
+    APP.Me.can_suggest = false;
+    $('#btn-accuse-suggest').text('Accuse');
+    $('#submit-suggest').hide();
+} // disableSuggest()
+
+function enableSuggest() {
+    APP.Me.can_suggest = true;
+    $('#btn-accuse-suggest').text('Suggest/Accuse');
+    $('#submit-suggest').show();
+} // enableSuggest()
+
+function closeModal() {
+    $.fancybox.close();
+} // closeModal()
+
+
 function init() {
 
     // Get list of characters and their location
@@ -28,6 +54,8 @@ function init() {
 
     APP.Me = {
         character: 'Plum',
+        can_move: true,
+        can_suggest: true
     };
 
     moveCharacter('Plum', APP.Me.location);
@@ -37,6 +65,7 @@ function init() {
     }
 
 } // init()
+
 
 function getMyLocation() {
     return APP.Players[APP.Me.character].location;
@@ -174,25 +203,36 @@ function displayDetectivePad() {
 } // displayDetectivePad()
 
 
+
 init();
 
-$body.on('click', 'rect', function () {
-    var $this = $(this),
-        type = $this.data('type'),
-        room = $this.data('id');
+$body.on('mouseenter mouseleave click', 'rect', function (e) {
+    if (APP.Me.can_move) {
+        var $this = $(this),
+            room  = $this.data('id');
 
-    if (type === 'passage') {
-        room = getHiddenPassageDestination(room);
+        if ($this.data('type') === 'passage') {
+            room  = getHiddenPassageDestination(room);
+            $this = $('rect[data-id="' + room + '"]');
+        }
+
+        if (isValidNeighbor(getMyLocation(), room)) {
+            switch (e.type) {
+            case 'mouseenter':
+                $this.attr('class', 'active');
+                break;
+            case 'mouseleave':
+                $this.attr('class', '');
+                break;
+            case 'click':
+                $this.attr('class', '');
+                updateCharacter(APP.Me.character, room);
+                moveCharacter(APP.Me.character, room);
+                disableMove();
+                break;
+            }
+        }
     }
-
-    if (!isValidNeighbor(room, getMyLocation())) {
-        alert('Invalid move');
-        return false;
-    } else {
-        updateCharacter(APP.Me.character, room);
-        moveCharacter(APP.Me.character, room);
-    }
-
 });
 
 /* suggest/accuse */
@@ -201,7 +241,11 @@ $body.on('click', '#submit-suggest', function () {
     var character = $('#game-accuse-suggest').find('select[name="character"] :selected').text(),
         weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
         room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
-    return confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon);
+
+    if (confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon)) {
+        disableSuggest();
+        closeModal();
+    }
 });
 
 $body.on('click', '#submit-accuse', function () {
@@ -212,9 +256,6 @@ $body.on('click', '#submit-accuse', function () {
 
     return confirm('Accuse ' + character + ' of murder in the ' + room + ' with the ' + weapon);
 });
-
-
-
 
 
 /*
