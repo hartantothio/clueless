@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -103,10 +104,16 @@ public class CluelessServlet extends WebSocketServlet{
            }
            else if(cmd instanceof ChangeCharacter){
               ChangeCharacter cc = (ChangeCharacter) cmd;
+              Set<Character> suspects = GameManager.getCharacters();
+              Character ch = null;
+              for(Character ch2 : suspects)
+                 if(ch2.getName().equals(cc.identity))
+                    ch = ch2;
+              if(ch == null) ch = new Character("<Random>");
               GameManager.getInstance().getGame(cc.gameId)
-                      .getPlayer(myoutbound).setCharacter(cc.identity);
+                      .getPlayer(myoutbound).setCharacter(ch);
               cc.identity = GameManager.getInstance().getGame(cc.gameId)
-                      .getPlayer(myoutbound).getCharacter();
+                      .getPlayer(myoutbound).getCharacter().getName();
               cmd = cc;
            }
            else if(cmd instanceof GetAvailableLanguages){
