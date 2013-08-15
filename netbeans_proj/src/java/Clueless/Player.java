@@ -4,6 +4,8 @@
  */
 package Clueless;
 
+import CluelessCommands.PlayerChat;
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.List;
@@ -115,7 +117,11 @@ public class Player {
             msg = msg.replace("\\s", arg.toString());
 
       try{
-      _clientSocket.writeTextMessage(CharBuffer.wrap(notice.toString() + "\n" + msg));
+         PlayerChat pc = new PlayerChat();
+         pc.gameId = _game.Id;
+         pc.msg = msg;
+         Gson gson = new Gson();
+      _clientSocket.writeTextMessage(CharBuffer.wrap(gson.toJson(pc, PlayerChat.class)));
       }
       catch(IOException iox){
          System.out.println(iox);
