@@ -138,7 +138,7 @@ public class GameManager {
       return retVal;
    }
    
-   public boolean joinGame(WsOutbound playerSoc, String playerLang, Long gameId){
+   public boolean joinGame(Long gameId, WsOutbound playerSoc, String playerLang){
       boolean retVal = false;
       Player p = new Player(playerSoc, playerLang);
       synchronized(_gamesLock){
@@ -152,6 +152,14 @@ public class GameManager {
       synchronized(_gamesLock){
          _games.remove(gameId);
       }
+   }
+   
+   public Game getGame(Long gameId){
+      Game g;
+      synchronized(_gamesLock){
+         g = _games.get(gameId);
+      }
+      return g;
    }
 
    /**

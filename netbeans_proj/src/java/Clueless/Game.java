@@ -106,10 +106,23 @@ public class Game {
    }
    
    public boolean removePlayer(Player p){
+      if(p == null) return false;
       List<Card> args = new ArrayList<Card>();
       args.add(p.getCharacter());
       notifyAllPlayers(NotificationEnum.PlayerQuit, args);
       return _players.remove(p);
+   }
+   
+   public Player getPlayer(WsOutbound wso){
+      for(Player p : _players)
+         if(p.getSocket() == wso)
+            return p;
+      
+      return null;
+   }
+   
+   public int getPlayerCount(){
+      return _players.size();
    }
    
    public void notifyAllPlayers(NotificationEnum notice, List args){
@@ -122,7 +135,9 @@ public class Game {
             p.notify(notice, args);
    }
    
-   public void start(){
+   public boolean start(){
+      //if(_players.size() < 3) return false;
+      
       //Determine a turn order
       List<Player> reorder = _players;
       Random r = new Random(System.currentTimeMillis());
@@ -155,6 +170,7 @@ public class Game {
       List args = new ArrayList();
       args.add(_players.get(_currentPlayer).getCharacter());
       notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
+      return true;
    }
    
    public void processSuggestion(WsOutbound pConn, Character murderer,
