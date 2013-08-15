@@ -59,6 +59,7 @@ h2 {
     overflow: hidden;
 }
 
+.menu li .submit,
 .menu li a {
     border: 1px solid #000;
     float: left;
@@ -66,6 +67,7 @@ h2 {
     margin-right: 20px;
     background-color: #ccc;
     text-decoration: none;
+    color: #000;
 }
 
 .menu li a:hover {

@@ -36,7 +36,6 @@ $body.on('click', '[data-toggle="modal"]', function () {
     $.fancybox({
         'centerOnScroll': true,
         'content': $($(this).attr('href'))[0].outerHTML
-        //'href': $(this).attr('href')
     });
     return false;
 });
