@@ -4,11 +4,13 @@
  */
 package Clueless;
 
+import CluelessCommands.Command;
 import CluelessCommands.PlayerChat;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import org.apache.catalina.websocket.WsOutbound;
 
@@ -18,7 +20,8 @@ import org.apache.catalina.websocket.WsOutbound;
  */
 public class Player {
    private WsOutbound _clientSocket;
-   private Game _game;
+   private Long _game;
+   private Long _id;
    private boolean _active;
    private Character _character;
    private Set<Card> _clues;
@@ -27,6 +30,9 @@ public class Player {
    public Player(WsOutbound conn, String lang){
       _clientSocket = conn;
       _selectedLanguage = lang;
+      
+      Random r = new Random(System.currentTimeMillis());
+      _id = r.nextLong();
    }
 
    /**
@@ -88,14 +94,14 @@ public class Player {
    /**
     * @return the _game
     */
-   public Game getGame() {
+   public Long getGame() {
       return _game;
    }
 
    /**
     * @param game the _game to set
     */
-   public void setGame(Game game) {
+   public void setGame(Long game) {
       this._game = game;
    }
    
@@ -106,19 +112,34 @@ public class Player {
       return _clientSocket;
    }
    
+   public Long getId(){
+      return _id;
+   }
+   
+   public void alert(Command c){
+      System.out.println("!!!ALERT!!!");
+      Gson gson = new Gson();
+      try{
+         _clientSocket.writeTextMessage(CharBuffer.wrap(gson.toJson(c, c.getClass())));
+      }
+      catch(Exception e){
+         System.out.println(e);
+      }
+   }
+   
    public void notify(NotificationEnum notice, List args){
       String msg = NotificationManager.getInstance().getRawNotification(_selectedLanguage, notice);
       
       if(msg.equals(""))
          if(args != null && args.iterator().hasNext())
-            msg = args.iterator().next().toString();
+            msg = "<" + _character.getName() + "> " + args.iterator().next().toString();
       else
          for(Object arg : args)
             msg = msg.replace("\\s", arg.toString());
 
       try{
          PlayerChat pc = new PlayerChat();
-         pc.gameId = _game.Id;
+         pc.gameId = _game;
          pc.msg = msg;
          Gson gson = new Gson();
       _clientSocket.writeTextMessage(CharBuffer.wrap(gson.toJson(pc, PlayerChat.class)));
@@ -129,7 +150,7 @@ public class Player {
    }
    
    public void notifyOthers(NotificationEnum notice, List args){
-      _game.notifyAllPlayers(notice, args);
+      GameManager.getInstance().getGame(_game).notifyAllPlayers(notice, args);
    }
    
    @Override

@@ -4,7 +4,7 @@
  */
 package CluelessCommands;
 
-import Clueless.Game;
+import Clueless.GameInfo;
 import java.util.Set;
 
 /**
@@ -14,7 +14,7 @@ import java.util.Set;
 public class QueryGames extends Command {
    public String playStyle;
    public Boolean secured;
-   public Set<Game> games;
+   public Set<GameInfo> games;
    public QueryGames(){
       super(QueryGames.class.getSimpleName());
    }

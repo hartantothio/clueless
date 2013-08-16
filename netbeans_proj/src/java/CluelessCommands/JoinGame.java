@@ -9,7 +9,7 @@ package CluelessCommands;
  * @author davis_gigogne
  */
 public class JoinGame extends Command {
-   public Long gameId;
+   public Long gameId, playerId;
    public String playerLanguage;
    public boolean joined;
    public JoinGame(){

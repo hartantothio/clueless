@@ -4,6 +4,7 @@
  */
 package Clueless;
 
+import CluelessCommands.Command;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -92,7 +93,7 @@ public class Game {
       //Remember, <Random> should always be available
       Set<Character> available = GameManager.getCharacters();
       for(Player p : _players)
-         if(!p.getCharacter().getName().equals("<Random>"))
+         if(!p.getCharacter().getName().equals("-Random-"))
          available.remove(p.getCharacter());
       return available;
    }
@@ -101,7 +102,7 @@ public class Game {
       if(_players.size() > 5) return false;
       p.setCharacter(getAvailableCharacters().iterator().next());
       p.setActive(true);
-      p.setGame(this);
+      p.setGame(this.Id);
       return _players.add(p);
    }
    
@@ -121,8 +122,17 @@ public class Game {
       return null;
    }
    
+   public List<Player> getPlayers(){
+      return _players;
+   }
+   
    public int getPlayerCount(){
       return _players.size();
+   }
+   
+   public void alertAllPlayers(Command c){
+      for(Player p : _players)
+         p.alert(c);
    }
    
    public void notifyAllPlayers(NotificationEnum notice, List args){
@@ -157,9 +167,9 @@ public class Game {
       //Make sure there are no more "random" characters
       Set<Character> available = getAvailableCharacters();
       if(available.size() != 1){
-         available.remove(new Character("<Random>"));
+         available.remove(new Character("-Random-"));
          for(Player p : _players)
-            if(p.getCharacter().getName().equals("<Random>")){
+            if(p.getCharacter().getName().equals("-Random-")){
                Iterator<Character> a = available.iterator();
                p.setCharacter(a.next());
                a.remove();

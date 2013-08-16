@@ -45,7 +45,7 @@ public class GameManager {
       _characters.add(new Character("Professor Plum"));
       _characters.add(new Character("Mrs. White"));
       _characters.add(new Character("Mr. Green"));
-      _characters.add(new Character("<Random>"));
+      _characters.add(new Character("-Random-"));
       
       //Weapons
       _weapons.add(new Weapon("Revolver"));
@@ -65,8 +65,8 @@ public class GameManager {
          "Billiard Room", "Dining Room", "Conservatory", "Ballroom", "Kitchen"};
       
       //Create the board
-      for(int i = 0; i < 5; ++i)
-         for(int j = 0; j < 5; ++j)
+      for(int i = 0; i < 4; ++i)
+         for(int j = 0; j < 4; ++j)
             if(i % 2 == 0 && j % 2 == 0)
                board[i][j] = new Room(roomNames[(3*i+j)/2], new Position(i, j));
             else if(i % 2 == 1 ^ j % 2 == 1)
@@ -76,8 +76,8 @@ public class GameManager {
       
       //Set neighbors
       Set<Location> neighbors;
-      for(int i = 0; i < 5; ++i)
-         for(int j = 0; j < 5; ++j){
+      for(int i = 0; i < 4; ++i)
+         for(int j = 0; j < 4; ++j){
             neighbors = new HashSet<Location>();
             
             if(board[i][j] != null){
@@ -125,14 +125,14 @@ public class GameManager {
       return g.Id;
    }
    
-   public Set<Game> queryGames(String playStyle, Boolean secured){
-      Set<Game> retVal = new HashSet<Game>();
+   public Set<GameInfo> queryGames(String playStyle, Boolean secured){
+      Set<GameInfo> retVal = new HashSet<GameInfo>();
       
       synchronized(_gamesLock){
       for(Game g : _games.values())
          if((playStyle.equals("") || g.getPlayStyle().equals(playStyle)) &&
                  (secured == null || g.getPassword().equals("") != secured))
-            retVal.add(g);
+            retVal.add(new GameInfo(g));
       }
       
       return retVal;

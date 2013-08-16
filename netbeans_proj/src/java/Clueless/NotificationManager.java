@@ -30,14 +30,20 @@ public class NotificationManager {
    private NotificationManager(){
       _notifications = new HashMap<String, Map<NotificationEnum, String>>();
       _clientStrings = new HashMap<String, List<String>>();
-      readNotificationFiles("../CluelessNotifications");
-      readClientStringFiles("../CluelessClientStrings");
+      readNotificationFiles("/CluelessV1/CluelessNotifications");
+      readClientStringFiles("/CluelessV1/CluelessClientStrings");
    }
    
    private void readNotificationFiles(String directory){
       //Get all the files in the directory
+      System.out.println("In readNotificationFiles");
+      try{
+      System.out.println("MY DIR: " + new File(".").getCanonicalPath());
+      }catch(Exception e){System.out.println(e);}
+      System.out.println("Dir: " + directory);
       File dir = new File(directory);
       File[] lFiles = dir.listFiles();
+      System.out.println("(NM)Number of files in "+directory+": " + lFiles == null ? "<NULL>" : lFiles.length);
       
       String[] ll;
       BufferedReader lin;

@@ -29,6 +29,7 @@ public class CluelessServlet extends WebSocketServlet{
 
     private class MyMessageInbound extends MessageInbound{
         WsOutbound myoutbound;
+        Long gameId;
 
         @Override
         public void onOpen(WsOutbound outbound){
@@ -49,26 +50,34 @@ public class CluelessServlet extends WebSocketServlet{
         @Override
         public void onClose(int status){
             System.out.println("Client disconnected");
-            //TODO: PlayerQuit
+            if(gameId != null)
+               GameManager.getInstance().getGame(gameId).removePlayer(
+                       GameManager.getInstance().getGame(gameId)
+                       .getPlayer(myoutbound)
+                       );
             mmiList.remove(this);
         }
 
         @Override
         public void onTextMessage(CharBuffer cb) throws IOException{
+           System.out.println("Raw JSON: " + new String(cb.array()));
            JsonReader jr = new JsonReader(new StringReader(cb.toString()));
            Gson gson = new Gson();
            Class<? extends Command> c = null;
            
            //Read the string for the command type
            try{
+              jr.beginObject();
             while(jr.hasNext()){
                String name = jr.nextName();
                String val = jr.nextString();
                if(name.equals("cmd")){
-                  c = (Class<? extends Command>) Class.forName(val);
+                  c = (Class<? extends Command>) Class.forName("CluelessCommands."+val);
                   break;
                }
             }
+            while(jr.hasNext()){jr.nextName(); jr.nextString();}
+            jr.endObject();
            }
            //If invalid command, "return" exception
            catch(ClassNotFoundException cnfe){
@@ -82,6 +91,8 @@ public class CluelessServlet extends WebSocketServlet{
               CreateGame cg = (CreateGame) cmd;
               cg.id = GameManager.getInstance().createGame(cg.playStyle,
                       cg.name, cg.password, myoutbound, cg.playerLanguage);
+              cg.playerId = GameManager.getInstance().getGame(cg.id).getPlayer(myoutbound).getId();
+              gameId = cg.id;
               cmd = cg;
            }
            else if(cmd instanceof QueryGames){
@@ -94,6 +105,12 @@ public class CluelessServlet extends WebSocketServlet{
               JoinGame jg = (JoinGame) cmd;
               jg.joined = GameManager.getInstance().joinGame(jg.gameId,
                       myoutbound, jg.playerLanguage);
+              if(jg.joined){
+                 gameId = jg.gameId;
+                 jg.playerId = GameManager.getInstance().getGame(jg.gameId)
+                         .getPlayer(myoutbound).getId();
+                 
+              }
               cmd = jg;
            }
            else if(cmd instanceof GetAvailableCharacters){
@@ -151,7 +168,9 @@ public class CluelessServlet extends WebSocketServlet{
            }
            
            //Return result
-           myoutbound.writeTextMessage(CharBuffer.wrap(gson.toJson(cmd, c)));
+           String retVal = gson.toJson(cmd, c);
+           System.out.println("Return JSON: " + retVal);
+           myoutbound.writeTextMessage(CharBuffer.wrap(retVal));
         }
 
         @Override
