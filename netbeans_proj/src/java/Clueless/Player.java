@@ -33,6 +33,7 @@ public class Player {
       
       Random r = new Random(System.currentTimeMillis());
       _id = r.nextLong();
+      if(_id < 0) _id = -_id;
    }
 
    /**
@@ -132,7 +133,7 @@ public class Player {
       
       if(msg.equals(""))
          if(args != null && args.iterator().hasNext())
-            msg = "<" + _character.getName() + "> " + args.iterator().next().toString();
+            msg = "|" + _character.getName() + "| " + args.iterator().next().toString();
       else
          for(Object arg : args)
             msg = msg.replace("\\s", arg.toString());

@@ -111,7 +111,9 @@ public class Game {
       List<Card> args = new ArrayList<Card>();
       args.add(p.getCharacter());
       notifyAllPlayers(NotificationEnum.PlayerQuit, args);
-      return _players.remove(p);
+      boolean retVal = _players.remove(p);
+      if(_players.isEmpty()) GameManager.getInstance().deleteGame(Id);
+      return retVal;
    }
    
    public Player getPlayer(WsOutbound wso){

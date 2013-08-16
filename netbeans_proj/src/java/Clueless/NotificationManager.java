@@ -30,20 +30,15 @@ public class NotificationManager {
    private NotificationManager(){
       _notifications = new HashMap<String, Map<NotificationEnum, String>>();
       _clientStrings = new HashMap<String, List<String>>();
-      readNotificationFiles("/CluelessV1/CluelessNotifications");
-      readClientStringFiles("/CluelessV1/CluelessClientStrings");
+      readNotificationFiles("/opt/tomcat/webapps/CluelessV1/WEB-INF/classes/CluelessNotifications");
+      readClientStringFiles("/opt/tomcat/webapps/CluelessV1/WEB-INF/classes/CluelessClientStrings");
    }
    
    private void readNotificationFiles(String directory){
       //Get all the files in the directory
-      System.out.println("In readNotificationFiles");
-      try{
-      System.out.println("MY DIR: " + new File(".").getCanonicalPath());
-      }catch(Exception e){System.out.println(e);}
-      System.out.println("Dir: " + directory);
       File dir = new File(directory);
       File[] lFiles = dir.listFiles();
-      System.out.println("(NM)Number of files in "+directory+": " + lFiles == null ? "<NULL>" : lFiles.length);
+      if(lFiles == null){System.out.println("NO FILES IN DIR!!"); return;}
       
       String[] ll;
       BufferedReader lin;
@@ -59,7 +54,7 @@ public class NotificationManager {
             
             while(lin.ready()){
                //'|' will separate the NotificationEnum from the pattern string
-               ll = lin.readLine().split("|");
+               ll = lin.readLine().split("\\|");
                
                //For robustness's sake, make sure there's only one '|' per line
                if(ll.length != 2){

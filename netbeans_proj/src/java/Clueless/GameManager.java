@@ -149,8 +149,10 @@ public class GameManager {
    }
    
    public void deleteGame(Long gameId){
+      System.out.print("Deleting game, new game count: ");
       synchronized(_gamesLock){
          _games.remove(gameId);
+         System.out.println(_games.size());
       }
    }
    
