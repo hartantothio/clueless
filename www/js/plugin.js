@@ -31,6 +31,20 @@ if (!Array.prototype.indexOf) {
     };
 }
 
+if (!Array.prototype.remove) {
+    Array.prototype.remove = function() {
+        var what, a = arguments, L = a.length, ax;
+        while (L && this.length) {
+            what = a[--L];
+            while ((ax = this.indexOf(what)) !== -1) {
+                this.splice(ax, 1);
+            }
+        }
+        return this;
+    };
+}
+
+
 var $body = $('body');
 $body.on('click', '[data-toggle="modal"]', function () {
     $.fancybox({
@@ -43,3 +57,15 @@ $body.on('click', '[data-toggle="modal"]', function () {
 $body.on('click', '.modal-close', function () {
     $.fancybox.close();
 });
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+
+
+
+
