@@ -11,47 +11,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/css/jquery.fancybox.css" />
 <link rel="stylesheet" href="/css/style.css" />
-<body>
+<body id="page-create">
 
 <h1>Clueless</h1>
 <h2>By Team Awareness</h2>
 <div id="container">
-    <div id="page-create">
-        <form action="" method="post">
-            <div class="control-group">
-                <label>Play Style</label>
-                <div class="control">
-                    <select name="style">
-                        <option value="">&laquo; Style &raquo;</option>
-                        <option value="casual">Casual</option>
-                        <option value="serious">Serious</option>
-                    </select>
-                </div>
+    <form action="" method="post">
+        <div class="control-group">
+            <label>Play Style</label>
+            <div class="control">
+                <select name="style">
+                    <option value="Casual">Casual</option>
+                    <option value="Serious">Serious</option>
+                </select>
             </div>
-            <div class="control-group">
-                <label>Server Name</label>
-                <div class="control">
-                    <input type="text" name="server" value="" placeholder="Server Name" />
-                </div>
+        </div>
+        <div class="control-group">
+            <label>Server Name</label>
+            <div class="control">
+                <input type="text" name="server" value="" placeholder="Server Name" />
             </div>
-            <div class="control-group">
-                <label>Password (optional)</label>
-                <div class="control">
-                    <input type="password" name="password" value="" />
-                </div>
-            </div>
-        </form><br />
+        </div>
+        <br />
         <ul class="menu">
             <li><a href="/index.html">Main Menu</a></li>
-            <li><a href="/pregame.html?id=123">Next</a></li>
+            <li><input type="submit" class="submit" name="submit" value="Create" /></li>
         </ul>
-    </div>
+    </form>
 </div>
 
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.cookie.js"></script>
 <script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
+<script>
+var $body = $('body');
+
+var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet");
+
+$('#page-create form').on('submit', function () {
+    var $this = $(this),
+        style = $this.find('select[name="style"]').val(),
+        server = $this.find('input[name="server"]').val();
+
+    ws.send(JSON.stringify({
+        cmd: 'CreateGame',
+        playStyle: style,
+        name: server,
+        password: '',
+        playerLanguage: 'English_USA'
+    }));
+
+    ws.onmessage = function (message) {
+        var data = JSON.parse(message.data);
+        $.cookie('player_id', data.playerId);
+        window.location = '/pregame.html?id=' + data.id;
+    };
+
+    return false;
+});
+
+ws.onopen = function (e) {
+
+};
+</script>
 </body>
 </html>

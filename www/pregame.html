@@ -17,47 +17,15 @@
 <h2>By Team Awareness</h2>
 <div id="container">
     <div id="page-pregame">
-        <h3>&laquo; Server Name &raquo;</h3>
+        <h3></h3>
         <table border="1" cellpadding="5" cellspacing="0">
             <tr>
                 <th>Player</th>
                 <th>Character</th>
             </tr>
-            <tr>
-                <td>1</td>
-                <td><select name="character">
-                    <option value="Plum">Professor Plum</option>
-                    <option value="Green">Mr. Green</option>
-                    <option value="Peacock">Mrs. Peacock</option>
-                    <option value="White">Mrs. White</option>
-                    <option value="Mustard">Colonel Mustard</option>
-                    <option value="Scarlet">Miss Scarlet</option>
-                    <option value="Random">Random</option>
-                </select></td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Colonel Mustard</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Mr. Green</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Mrs. Peacock</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>Mrs. White</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>Miss Scarlet</td>
-            </tr>
         </table><br />
         <ul class="menu">
-            <li><a href="/index.html">Main Menu</a></li>
+            <li><a id="btn-quit" href="/index.html">Main Menu</a></li>
             <li><a href="/game.html">Play!</a></li>
         </ul>
     </div>
@@ -66,7 +34,90 @@
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.cookie.js"></script>
 <script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
+<script>
+$(function () {
+    var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+        game_id = +getUrlVars()['id'],
+        $table = $('table'),
+        characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Mrs. Peacock'];
+
+    $('#btn-quit').on('click', function () {
+        ws.send(JSON.stringify({
+            cmd: 'PlayerQuit',
+            gameId: game_id
+        }));
+        return false;
+    });
+
+    ws.onopen = function () {
+        ws.send(JSON.stringify({
+            cmd: 'QueryGames',
+            playStyle: '',
+            secured: ''
+        }));
+    };
+
+    ws.onmessage = function(message) {
+        var data = JSON.parse(message.data),
+            i = 0,
+            tmp = '',
+            tmp_2 = '',
+            game = null,
+            player = null;
+
+        if (data.cmd === 'QueryGames') {
+            if (data.games && data.games.length) {
+                for (i = 0; i < data.games.length; i++) {
+                    game = data.games[i];
+                    if (game.id === game_id) {
+                        $('h3').html(game.name);
+                        for (i = 0; i < game.players.length; i++) {
+                            player = game.players[i];
+                            characters.remove(player.character);
+                            tmp_2 = '<tr><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
+                            if (player.id === $.cookie('player_id')) {
+                                tmp = tmp_2 + tmp;
+                            } else {
+                                tmp += tmp_2;
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                $table.append(tmp);
+
+                // create select
+                tmp = '';
+                tmp_2 = $table.find('tr:eq(1)').find('td:eq(1)');
+                player = tmp_2.text();
+                tmp += '<option value="' + player + '">' + player + '</option>';
+                for (i = 0; i < characters.length; i++) {
+                    tmp += '<option value="' + characters[i] + '">' + characters[i] + '</option>';
+                }
+                tmp = '<td><select name="character">' + tmp + '</select></td>';
+                tmp_2.replaceWith(tmp);
+            }
+        } else if (data.cmd === 'PlayerQuit') {
+            console.dir(data);
+            //window.location = '/index.html';
+        } else {
+            //.location = '/pregame.html?id=' + data.id;
+        }
+    };
+
+    $('#page-create form').on('submit', function () {
+        var $this = $(this),
+            style = $this.find('select[name="style"]'),
+            server = $this.find('input[name="server"]'),
+            password = $this.find('input[name="password"]');
+
+        return false;
+    });
+});
+</script>
 </body>
 </html>
