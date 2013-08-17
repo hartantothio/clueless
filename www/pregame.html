@@ -45,6 +45,12 @@ $(function () {
         $table = $('table'),
         characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
 
+    ws.send(JSON.stringify({
+        cmd: 'KeepAlive',
+        playerId: me_id,
+        gameId: game_id
+    }));
+
     $('#btn-quit').on('click', function () {
         ws.send(JSON.stringify({
             cmd: 'PlayerQuit',

@@ -65,15 +65,7 @@ $('#page-create form').on('submit', function () {
     ws.onmessage = function (message) {
         var data = JSON.parse(message.data);
         $.cookie('player_id', data.playerId);
-        ws.send(JSON.stringify({
-            cmd: 'KeepAlive',
-            playerId: data.playerId,
-            gameId: data.id
-        }));
-
-        setTimeout(function () {
-            window.location = '/pregame.html?id=' + data.id;
-        }, 1000);
+        window.location = '/pregame.html?id=' + data.id;
     };
 
     return false;

@@ -91,16 +91,7 @@ ws.onopen = function (e) {
         } else if (data.cmd === 'JoinGame') {
             if (data.joined) {
                 $.cookie('player_id', data.playerId);
-                ws.send(JSON.stringify({
-                    cmd: 'KeepAlive',
-                    playerId: data.playerId,
-                    gameId: data.gameId
-                }));
-
-                setTimeout(function () {
-                    window.location = '/pregame.html?id=' + data.gameId;
-                }, 1000);
-
+                window.location = '/pregame.html?id=' + data.gameId;
             } else {
                 alert('Cannot join the game!');
             }
