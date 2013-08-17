@@ -80,7 +80,11 @@ ws.onopen = function (e) {
         if (data.cmd === 'QueryGames') {
             if (data.games && data.games.length) {
                 for (i = 0; i < data.games.length; i++) {
-                    tmp += '<tr class="placeholder"><td><a href="/pregame.html?id=' + data.games[i].id + '" data-id="' + data.games[i].id + '">' + data.games[i].name + '</a></td><td>(' + data.games[i].players.length + '/6)</td><td>' + data.games[i].playStyle + '</td></tr>';
+                    if (data.games[i].started) {
+                        tmp += '<tr class="placeholder"><td>' + data.games[i].name + '</td><td>(' + data.games[i].players.length + '/6)</td><td>' + data.games[i].playStyle + '</td></tr>';
+                    } else {
+                        tmp += '<tr class="placeholder"><td><a href="/pregame.html?id=' + data.games[i].id + '" data-id="' + data.games[i].id + '">' + data.games[i].name + '</a></td><td>(' + data.games[i].players.length + '/6)</td><td>' + data.games[i].playStyle + '</td></tr>';
+                    }
                 }
             } else {
                 tmp += '<tr class="placeholder"><td colspan="3">No game at the moment</td></tr>';
