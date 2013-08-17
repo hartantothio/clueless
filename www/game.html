@@ -299,8 +299,8 @@ ws.onmessage = function(message) {
                             addSystemNotification('It is now ' + data.games[i].players[j].character + '\'s turn.');
 
                             if (APP.Me.id === +data.games[i].currentPlayer) {
-                                APP.Me['can_move'] = true;
-                                APP.Me['can_suggest'] = true;
+                                disableMove();
+                                disableSuggest();
                             }
                             break;
                         }
@@ -317,10 +317,9 @@ ws.onmessage = function(message) {
             }
         }
     } else if (data.cmd === 'GameUpdate') {
-        console.dir(data);
-        console.log(me_id);
-        console.log(data.gameInfo.currentPlayer);
         if (me_id === +data.gameInfo.currentPlayer) {
+            enableMove();
+            enableSuggest();
             toggleGameTurn(true);
         }
     }
