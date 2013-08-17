@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,7 +155,7 @@ public class CluelessServlet extends WebSocketServlet{
            }
            else if(cmd instanceof ChangeCharacter){
               ChangeCharacter cc = (ChangeCharacter) cmd;
-              Set<Character> suspects = GameManager.getCharacters();
+              Set<Character> suspects = new HashSet<Character>((Set)GameManager.getCharacters());
               Character ch = null;
               for(Character ch2 : suspects)
                  if(ch2.getName().equals(cc.identity))
@@ -214,6 +215,7 @@ public class CluelessServlet extends WebSocketServlet{
               if(sf != null)
                   sf.cancel(true);
               CluelessServlet.removals.remove(ka.playerId);
+              System.out.println("(KA) game: " + ka.gameId + " / player: " + ka.playerId);
               GameManager.getInstance().getGame(ka.gameId).getPlayer(ka.playerId).setSocket(myoutbound);
            }
            else if(cmd instanceof EndTurn){
@@ -224,6 +226,22 @@ public class CluelessServlet extends WebSocketServlet{
                       , false);
               GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(et.gameId));
               GameManager.getInstance().getGame(et.gameId).alertAllPlayers(gu);
+           }
+           else if(cmd instanceof PlayerMove){
+              PlayerMove pm = (PlayerMove) cmd;
+              ArrayList args = new ArrayList();
+              args.add(GameManager.getInstance().getGame(pm.gameId).getPlayer(pm.playerId));
+              args.add(pm.room);
+              GameManager.getInstance().getGame(pm.gameId).notifyAllPlayers(NotificationEnum.PlayerMoved, args);
+              GameManager.getInstance().getGame(pm.gameId).alertAllPlayers(pm);
+           }
+           else if(cmd instanceof GetClues){
+              GetClues gc = (GetClues) cmd;
+              Set<Card> clues = GameManager.getInstance().getGame(gc.gameId).getPlayer(gc.playerId).getClues();
+              System.out.println("(GC) Size of clues: " + clues.size());
+              for(Card card : clues) System.out.println(card);
+              gc.clues = clues;
+              cmd = gc;
            }
            
            //Return result

@@ -42,13 +42,17 @@ public class Game {
    
    private void generateSolution(){
       Random r = new Random(System.currentTimeMillis());
-      Set<Character> chars = GameManager.getCharacters();
+      Set<Character> chars = new HashSet<Character>((Set)GameManager.getCharacters());
       for(Iterator<Character> i = chars.iterator(); i.hasNext();)
          if(i.next().getName().equals("-Random-"))
             i.remove();
       _solution.add((Card)chars.toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getWeapons().toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getRooms().toArray()[r.nextInt(9)]);
+      
+      System.out.println("(Game) solution:");
+      for(Card c : _solution)System.out.println(c);
+      System.out.println("(Game) END solution");
    }
 
    /**
@@ -102,7 +106,7 @@ public class Game {
    
    public Set<Character> getAvailableCharacters(){
       //Remember, <Random> should always be available
-      Set<Character> available = new HashSet<Character>(GameManager.getCharacters());
+      Set<Character> available = new HashSet<Character>((Set)GameManager.getCharacters());
       for(Player p : _players)
          if(!p.getCharacter().getName().equals("-Random-"))
          available.remove(p.getCharacter());
@@ -207,23 +211,42 @@ public class Game {
    }
    
    public boolean start(){
-      //if(_players.size() < 3) return false;
+      if(_players.size() < 3) return false;
       
-      //Determine a turn order
+      //Determine a solution
+      generateSolution();
+      
+      //Get clues for players
+      Set<Card> deck = GameManager.getCharacters();
+      deck.addAll(GameManager.getRooms());
+      deck.addAll(GameManager.getWeapons());
+      deck.removeAll(_solution);
+      deck.remove(new Character("-Random-"));
+      
+      //Determine a turn order and give players clues
       List<Player> reorder = new ArrayList<Player>(_players);
       Random r = new Random(System.currentTimeMillis());
       
       _players.clear();
       int i;
+      Iterator<Card> clueIndex = deck.iterator();
+      Set<Card> clues = new HashSet<Card>();
       while(reorder.size() > 0){
          i = r.nextInt(reorder.size());
+         
+         clues.add(clueIndex.next());
+         clueIndex.remove();
+         clues.add(clueIndex.next());
+         clueIndex.remove();
+         clues.add(clueIndex.next());
+         clueIndex.remove();
+         
+         reorder.get(i).setClues(new HashSet<Card>(clues));
+         clues.clear();
          _players.add(reorder.get(i));
          reorder.remove(i);
       }
       _currentPlayer = 0;
-      
-      //Determine a solution
-      generateSolution();
       
       //Make sure there are no more "random" characters
       List<Character> available = new ArrayList<Character>(getAvailableCharacters());

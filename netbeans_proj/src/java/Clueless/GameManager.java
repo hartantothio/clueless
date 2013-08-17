@@ -203,25 +203,25 @@ public class GameManager {
    /**
     * @return the _board
     */
-   public static Set<Room> getRooms() {
-      return new HashSet<Room>(_rooms);
+   public static Set<Card> getRooms() {
+      return new HashSet<Card>(_rooms);
    }
    
-   public static Set<Hall> getHalls(){
-      return new HashSet<Hall>(_halls);
+   public static Set<Card> getHalls(){
+      return new HashSet<Card>(_halls);
    }
    
-   public static Set<Location> getBoard(){
-      Set<Location> board = new HashSet<Location>(_rooms);
+   public static Set<Card> getBoard(){
+      Set<Card> board = new HashSet<Card>(_rooms);
       board.addAll(_halls);
       return board;
    }
    
-   public static Set<Character> getCharacters(){
-      return new HashSet<Character>(_characters);
+   public static Set<Card> getCharacters(){
+      return new HashSet<Card>(_characters);
    }
    
-   public static Set<Weapon> getWeapons(){
-      return new HashSet<Weapon>(_weapons);
+   public static Set<Card> getWeapons(){
+      return new HashSet<Card>(_weapons);
    }
 }

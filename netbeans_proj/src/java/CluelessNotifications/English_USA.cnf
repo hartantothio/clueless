@@ -1,4 +1,4 @@
-PlayerMoved                      | "xx has moved to xx", 
+PlayerMoved                      | "xx has moved to the xx", 
 PlayerMadeSuggestion             | "xx suggests it was xx in the xx with the xx",
 PlayerMustDisproveSuggestion     | "", 
 PlayerDisprovedSuggestion        | "xx has disproven xx's suggestion",
