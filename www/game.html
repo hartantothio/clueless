@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="/css/style.css" />
 <body>
 
+<h2 id="title"></h2>
+
 <div id="container">
     <div id="canvas"></div>
     <div id="sidebar">
@@ -25,7 +27,7 @@
     <div class="clear"></div>
     <ul class="menu">
         <li><a href="#game-accuse-suggest" id="btn-accuse-suggest">Suggest/Accuse</a></li>
-        <li><a href="#game-menu" data-toggle="modal">Menu</a></li>
+        <!--<li><a href="#game-menu" data-toggle="modal">Menu</a></li>-->
         <li><a href="#game-endturn" onclick="return confirm('Are you sure you want to end your turn?');">End Turn</a></li>
         <li><a href="#game-quit" onclick="return confirm('Are you sure you want to quit?');">Quit</a></li>
     </ul>
@@ -142,12 +144,37 @@ var APP = {};
     ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
     me_id = +$.cookie('player_id'),
     game_id = +getUrlVars()['id'],
+    creator_id = null,
     $notification_system = $('#notification-system'),
-    $notification_chat = $('#notification-chat');
+    $notification_chat = $('#notification-chat'),
+    $game_accuse_suggest = $('#game-accuse-suggest'),
+    $game_endturn = $('#game-endturn');
+
+function updateGame(game) {
+    // update title
+    $('#title').html(game.name);
+    creator_id = +game.creatorId;
+} // updateGame()
+
+function toggleGameTurn(show) {
+    if (show === true) {
+        $game_accuse_suggest.show();
+        $game_endturn.show();
+    } else {
+        $game_accuse_suggest.hide();
+        $game_endturn.hide();
+    }
+} // updateGameTurn()
 
 ws.onopen = function () {
     ws.send(JSON.stringify({
         cmd: 'KeepAlive',
+        playerId: me_id,
+        gameId: game_id
+    }));
+
+    ws.send(JSON.stringify({
+        cmd: 'QueryGames',
         playerId: me_id,
         gameId: game_id
     }));
@@ -156,12 +183,29 @@ ws.onopen = function () {
 ws.onmessage = function(message) {
     var data = JSON.parse(message.data);
 
-    if (data.cmd === 'PlayerChat') {
+    if (data.cmd === 'KeepAlive') {
+
+    } else if (data.cmd === 'PlayerChat') {
         if (data.playerId) {
 
         } else {
             addChatNotification(data.msg);
         }
+    } else if (data.cmd === 'PlayerQuit') {
+        window.location = '/';
+    } else if (data.cmd === 'QueryGames') {
+        if (data.games && data.games.length) {
+            for (i = 0; i < data.games.length; i++) {
+                if (data.games[i].id === game_id) {
+                    updateGame(data.games[i]);
+                    break;
+                }
+            }
+        }
+    } else if (data.cmd === 'GameUpdate') {
+        console.dir(data);
+    } else if (data.cmd === 'EndTurn') {
+        toggleGameTurn(false);
     }
 };
 
@@ -185,6 +229,20 @@ $('form#chat').on('submit', function () {
 });
 
 $('#game-quit').on('click', function () {
+    ws.send(JSON.stringify({
+        cmd: 'PlayerQuit',
+        gameId: game_id,
+        playerId: me_id
+    }));
+    return false;
+});
+
+$('#game-endturn').on('click', function () {
+    ws.send(JSON.stringify({
+        cmd: 'EndTurn',
+        gameId: game_id,
+        playerId: me_id
+    }));
     return false;
 });
 

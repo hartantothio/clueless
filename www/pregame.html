@@ -85,8 +85,7 @@ $(function () {
         $table.append(tmp);
 
         // toggle play button
-        //if (game.players.length >= 3 && me_id === creator_id) {
-        if (game.players.length >= 1 && me_id === creator_id) {
+        if (game.players.length >= 3 && me_id === creator_id) {
             if (!$('#btn-play').length) {
                 $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
             }
@@ -146,7 +145,6 @@ $(function () {
         if (data.cmd === 'QueryGames') {
             if (data.games && data.games.length) {
                 for (i = 0; i < data.games.length; i++) {
-                    game = data.games[i];
                     if (data.games[i].id === game_id) {
                         updateGame(data.games[i]);
                         break;
