@@ -166,17 +166,20 @@ ws.onmessage = function(message) {
 };
 
 $('form#chat').on('submit', function () {
-    var $message = $(this).find('input[name="message"]');
+    var $message = $(this).find('input[name="message"]'),
+        message = $message.val().trim();
 
-    ws.send(JSON.stringify({
-        cmd: 'PlayerChat',
-        gameId: game_id,
-        playerId: me_id,
-        msg: $message.val()
-    }));
+    if (message) {
+        ws.send(JSON.stringify({
+            cmd: 'PlayerChat',
+            gameId: game_id,
+            playerId: me_id,
+            msg: $message.val()
+        }));
 
-    // empty out the message
-    $message.val('');
+        // empty out the message
+        $message.val('');
+    }
 
     return false;
 });
