@@ -15,9 +15,11 @@ public class GameInfo {
    public Integer creatorId, currentPlayer;
    public String name, playStyle, password;
    public PlayerInfo[] players;
+   public boolean started;
    
    public GameInfo(Game g){
       id = g.Id;
+      started = g.getStarted();
       creatorId = g.creatorId;
       Player p = g.getCurrentPlayer();
       currentPlayer = p == null ? -1 : p.getId();

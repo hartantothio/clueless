@@ -116,7 +116,7 @@ public class CluelessServlet extends WebSocketServlet{
            
            //Begin call logic
            Command cmd = gson.fromJson(cb.toString(), c);
-           System.out.println("Raw JSON: " + new String(cb.append('\0').array()));
+           System.out.println("Raw JSON: " + new String(cb.array(), 0, cb.length()));
            
            if(cmd instanceof CreateGame){
               CreateGame cg = (CreateGame) cmd;
@@ -140,7 +140,7 @@ public class CluelessServlet extends WebSocketServlet{
                  gameId = jg.gameId;
                  jg.playerId = GameManager.getInstance().getGame(jg.gameId)
                          .getPlayer(myoutbound).getId();
-                 GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(jg.gameId), false);
+                 GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(jg.gameId));
                  GameManager.getInstance().getGame(jg.gameId).alertAllPlayers(gu);
                  
               }
@@ -164,7 +164,7 @@ public class CluelessServlet extends WebSocketServlet{
                       .getPlayer(myoutbound).setCharacter(ch);
               cc.identity = GameManager.getInstance().getGame(cc.gameId)
                       .getPlayer(myoutbound).getCharacter().getName();
-              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(cc.gameId), false);
+              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(cc.gameId));
               GameManager.getInstance().getGame(cc.gameId).alertAllPlayers(gu);
               cmd = cc;
            }
@@ -185,7 +185,7 @@ public class CluelessServlet extends WebSocketServlet{
               StartGame sg = (StartGame) cmd;
               sg.started = GameManager.getInstance().getGame(sg.gameId).start();
               if(sg.started){
-                  GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(sg.gameId), true);
+                  GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(sg.gameId));
                   GameManager.getInstance().getGame(sg.gameId).alertAllPlayers(gu);
               }
            }
@@ -201,7 +201,7 @@ public class CluelessServlet extends WebSocketServlet{
            else if(cmd instanceof PlayerQuit){
               PlayerQuit pq = (PlayerQuit) cmd;
               pq.quit = GameManager.getInstance().leaveGame(pq.gameId, pq.playerId);
-              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(pq.gameId), false);
+              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(pq.gameId));
               GameManager.getInstance().getGame(pq.gameId).alertAllPlayers(gu);
               
               if(GameManager.getInstance().getGame(pq.gameId).getPlayerCount() == 0)
@@ -217,11 +217,12 @@ public class CluelessServlet extends WebSocketServlet{
               GameManager.getInstance().getGame(ka.gameId).getPlayer(ka.playerId).setSocket(myoutbound);
            }
            else if(cmd instanceof EndTurn){
+              System.out.println("Ending turn!");
               EndTurn et = (EndTurn) cmd;
               GameManager.getInstance().getGame(et.gameId).processEndTurn(
                       GameManager.getInstance().getGame(et.gameId).getPlayer(et.playerId)
-                      );
-              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(et.gameId), false);
+                      , false);
+              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(et.gameId));
               GameManager.getInstance().getGame(et.gameId).alertAllPlayers(gu);
            }
            

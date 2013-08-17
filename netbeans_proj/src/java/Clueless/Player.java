@@ -134,6 +134,7 @@ public class Player {
    }
    
    public void notify(NotificationEnum notice, List args){
+      System.out.println("???NOTIFY???");
       String msg = NotificationManager.getInstance().getRawNotification(_selectedLanguage, notice);
       
       if(msg.equals("") && args != null && args.iterator().hasNext())
