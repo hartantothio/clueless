@@ -76,7 +76,6 @@
             <label>Action: </label>
             <div class="control">
                 <select name="action">
-                    <option value="suggest">Suggest</option>
                     <option value="accuse">Accuse</option>
                </select>
             </div>
@@ -85,12 +84,12 @@
             <label>Character: </label>
             <div class="control">
                 <select name="character">
-                    <option value="Green">Green</option>
-                    <option value="Scarlet">Scarlet</option>
-                    <option value="Plum">Plum</option>
-                    <option value="Peacock">Peacock</option>
-                    <option value="White">White</option>
-                    <option value="Mustard">Mustard</option>
+                    <option value="Mr. Green">Mr. Green</option>
+                    <option value="Miss Scarlet">Miss Scarlet</option>
+                    <option value="Professor Plum">Professor Plum</option>
+                    <option value="Ms. Peacock">Ms. Peacock</option>
+                    <option value="Mrs. White">Mrs. White</option>
+                    <option value="Colonel Mustard">Colonel Mustard</option>
                </select>
             </div>
         </div>
@@ -439,6 +438,12 @@ $body.on('submit', '#game-accuse-suggest form', function () {
             closeModal();
             disableSuggest();
             addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
+            ws.send(JSON.stringify({
+                cmd: 'PlayerMove',
+                playerId: me_id,
+                gameId: game_id,
+                room: room
+            }));
         } else {
 
         }
