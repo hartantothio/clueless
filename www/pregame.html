@@ -26,7 +26,6 @@
         </table><br />
         <ul class="menu">
             <li><a id="btn-quit" href="/index.html">Main Menu</a></li>
-            <li><a href="/game.html">Play!</a></li>
         </ul>
     </div>
 </div>
@@ -40,9 +39,11 @@
 <script>
 $(function () {
     var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+        me_id = +$.cookie('player_id'),
         game_id = +getUrlVars()['id'],
+        creator_id = null,
         $table = $('table'),
-        characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Mrs. Peacock'];
+        characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
 
     $('#btn-quit').on('click', function () {
         ws.send(JSON.stringify({
@@ -50,6 +51,14 @@ $(function () {
             gameId: game_id
         }));
         return false;
+    });
+
+    $body.on('change', 'select[name="character"]', function () {
+        ws.send(JSON.stringify({
+            cmd: 'ChangeCharacter',
+            gameId: game_id,
+            identity: this.value
+        }));
     });
 
     ws.onopen = function () {
@@ -73,21 +82,27 @@ $(function () {
                 for (i = 0; i < data.games.length; i++) {
                     game = data.games[i];
                     if (game.id === game_id) {
+                        creator_id = game.creatorId;
                         $('h3').html(game.name);
                         for (i = 0; i < game.players.length; i++) {
                             player = game.players[i];
                             characters.remove(player.character);
                             tmp_2 = '<tr><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
-                            if (player.id === $.cookie('player_id')) {
+                            if (player.id === me_id) {
                                 tmp = tmp_2 + tmp;
                             } else {
                                 tmp += tmp_2;
                             }
                         }
+
+                        if (game.players.length >= 3) {
+                            $('.menu').append('<li><a href="/game.html?id=' + id + '">Play!</a></li>');
+                        }
                         break;
                     }
                 }
 
+                $table.find('tr:gt(0)').remove();
                 $table.append(tmp);
 
                 // create select
@@ -104,6 +119,8 @@ $(function () {
         } else if (data.cmd === 'PlayerQuit') {
             console.dir(data);
             //window.location = '/index.html';
+        } else if (data.cmd === 'ChangeCharacter') {
+            console.dir(data);
         } else {
             //.location = '/pregame.html?id=' + data.id;
         }
@@ -117,6 +134,15 @@ $(function () {
 
         return false;
     });
+/*
+    var interval_id = setInterval(function () {
+        ws.send(JSON.stringify({
+            cmd: 'QueryGames',
+            playStyle: '',
+            secured: ''
+        }));
+    }, 500);
+*/
 });
 </script>
 </body>

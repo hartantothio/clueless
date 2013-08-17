@@ -47,8 +47,6 @@
 <script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
 <script>
-var $body = $('body');
-
 var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet");
 
 $('#page-create form').on('submit', function () {
@@ -67,6 +65,11 @@ $('#page-create form').on('submit', function () {
     ws.onmessage = function (message) {
         var data = JSON.parse(message.data);
         $.cookie('player_id', data.playerId);
+        ws.send(JSON.stringify({
+            cmd: 'KeepAlive',
+            playerId: data.playerId,
+            gameId: data.id
+        });
         window.location = '/pregame.html?id=' + data.id;
     };
 
