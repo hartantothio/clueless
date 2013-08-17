@@ -9,6 +9,11 @@
 <title>Clueless</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.cookie.js"></script>
+<script src="/js/jquery.fancybox.min.js"></script>
+<script src="/js/plugin.js"></script>
 <script>
 var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
     me_id = +$.cookie('player_id'),
@@ -42,11 +47,6 @@ ws.send(JSON.stringify({
 </div>
 
 </body>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
-<script src="/js/jquery.cookie.js"></script>
-<script src="/js/jquery.fancybox.min.js"></script>
-<script src="/js/plugin.js"></script>
 <script>
 $(function () {
     var creator_id = null,
