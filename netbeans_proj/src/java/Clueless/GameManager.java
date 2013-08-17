@@ -116,8 +116,8 @@ public class GameManager {
    public Long createGame(String playStyle, String name, String password,
            WsOutbound playerSoc, String playerLang){
       if(name.equals("")) name = "Case #" + _caseNumber;
-      Game g = new Game(_caseNumber++, playStyle, name, password);
       Player p = new Player(playerSoc, playerLang);
+      Game g = new Game(_caseNumber++, p.getId(), playStyle, name, password);
       g.addPlayer(p);
       synchronized(_gamesLock){
          _games.put((Long)g.Id, g);
@@ -142,16 +142,28 @@ public class GameManager {
       boolean retVal = false;
       Player p = new Player(playerSoc, playerLang);
       synchronized(_gamesLock){
-         if(_games.get(gameId) != null)
-            retVal = _games.get(gameId).addPlayer(p);
+         if(_games.get(gameId) != null){
+            Game g = _games.get(gameId);
+            _games.remove(gameId);
+            retVal = g.addPlayer(p);
+            if(retVal) _games.put(gameId, g);
+         }
       }
       return retVal;
    }
    
    public boolean leaveGame(Long gameId, Long playerId){
+      System.out.println("(GameManager) Game ID: " + gameId + " / Player ID: " + playerId);
       boolean retVal;
       synchronized(_gamesLock){
-         retVal = _games.get(gameId).removePlayer(_games.get(gameId).getPlayer(playerId));
+         Game g = _games.get(gameId);
+         _games.remove(gameId);
+         retVal = g.removePlayer(g.getPlayer(playerId));
+         _games.put(gameId, g);
+         if(retVal)
+            System.out.println("(GameManager) Player deleted!");
+         else
+            System.out.println("(GameManager) Game failed to delete!");
       }
       return retVal;
    }

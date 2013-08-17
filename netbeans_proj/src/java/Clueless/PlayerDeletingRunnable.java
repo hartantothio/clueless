@@ -18,8 +18,10 @@ public class PlayerDeletingRunnable implements Runnable {
 
    @Override
    public void run() {
-      GameManager.getInstance().leaveGame(gId, pId);
-      System.out.println("Player deleted!");
+      if(GameManager.getInstance().leaveGame(gId, pId))
+         System.out.println("(PlayerDeletingRunnable) Player deleted!");
+      else
+         System.out.println("(PlayerDeletingRunnable) GameManager failed to delete!");
    }
    
 }

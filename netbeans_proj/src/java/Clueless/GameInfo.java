@@ -11,12 +11,13 @@ import java.util.List;
  * @author davis_gigogne
  */
 public class GameInfo {
-   public Long id;
+   public Long id, creatorId;
    public String name, playStyle, password;
    public PlayerInfo[] players;
    
    public GameInfo(Game g){
       id = g.Id;
+      creatorId = g.creatorId;
       name = g.getName();
       playStyle = g.getPlayStyle();
       password = g.getPassword();

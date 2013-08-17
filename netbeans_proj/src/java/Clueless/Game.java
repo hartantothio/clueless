@@ -17,15 +17,16 @@ import org.apache.catalina.websocket.WsOutbound;
  * @author davis_gigogne
  */
 public class Game {
-   public final long Id;
+   public final long Id, creatorId;
    private String _playStyle, _name, _password;
    private Set<Card> _solution;
    private List<Player> _players;
    private Player _lastSuggestor;
    private int _currentPlayer;
    
-   public Game(long id, String playStyle, String name, String password){
+   public Game(long id, long creatorId, String playStyle, String name, String password){
       Id = id;
+      this.creatorId = creatorId;
       _playStyle = playStyle;
       _name = name;
       _password = password;
@@ -107,28 +108,41 @@ public class Game {
    }
    
    public boolean removePlayer(Player p){
-      if(p == null) return false;
+      if(p != null)
+         System.out.println("(Game) Player ID: " + p.getId());
+      if(p == null){
+         System.out.println("(Game) Player is null!");
+         return false;
+      }
+      
       List<Card> args = new ArrayList<Card>();
       args.add(p.getCharacter());
       notifyAllPlayers(NotificationEnum.PlayerQuit, args);
       if(_players.indexOf(p) == _currentPlayer) processEndTurn(p);
       boolean retVal = _players.remove(p);
+      if(retVal) System.out.println("(Game) Player deleted!");
       if(_players.isEmpty()) GameManager.getInstance().deleteGame(Id);
       return retVal;
    }
    
    public Player getPlayer(WsOutbound wso){
-      for(Player p : _players)
-         if(p.getSocket() == wso)
+      System.out.println("(Game) getPlayer given wso: " + wso.toString());
+      for(Player p : _players){
+         System.out.println("(Game) wso = " + p.getSocket().toString());
+         if(p.getSocket().equals(wso))
             return p;
+      }
       
       return null;
    }
    
    public Player getPlayer(Long id){
-      for(Player p : _players)
-         if(p.getId() == id)
+      System.out.println("(Game) getPlayer given ID: " + id);
+      for(Player p : _players){
+         System.out.println("(Game) pId = " + p.getId());
+         if(p.getId().longValue() == id.longValue())
             return p;
+      }
       
       return null;
    }

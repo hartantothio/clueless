@@ -16,13 +16,15 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.catalina.websocket.MessageInbound;
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
 
-public class CluelessServlet extends WebSocketServlet{
+public class CluelessServlet extends WebSocketServlet implements ServletContextListener{
     private static final long serialVersionUID = 1L;
     private static ArrayList<MyMessageInbound> mmiList = new ArrayList<MyMessageInbound>();
     private static Map<Long, PlayerDeletingRunnable> removals = new HashMap<Long, PlayerDeletingRunnable>();
@@ -32,6 +34,17 @@ public class CluelessServlet extends WebSocketServlet{
     public StreamInbound createWebSocketInbound(String protocol, HttpServletRequest hsr){
         return new MyMessageInbound();
     }
+
+   @Override
+   public void contextInitialized(ServletContextEvent sce) {
+      System.out.println("Context created!");
+   }
+
+   @Override
+   public void contextDestroyed(ServletContextEvent sce) {
+      remover.shutdownNow();
+      System.out.println("Context destroyed!");
+   }
 
     private class MyMessageInbound extends MessageInbound{
         WsOutbound myoutbound;
