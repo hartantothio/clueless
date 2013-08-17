@@ -9,7 +9,7 @@ package CluelessCommands;
  * @author davis_gigogne
  */
 public class PlayerQuit extends Command {
-   public Long gameId;
+   public Long gameId, playerId;
    public boolean quit;
    
    public PlayerQuit(){

@@ -99,6 +99,7 @@ public class CluelessServlet extends WebSocketServlet{
            
            //Begin call logic
            Command cmd = gson.fromJson(cb.toString(), c);
+           
            if(cmd instanceof CreateGame){
               CreateGame cg = (CreateGame) cmd;
               cg.id = GameManager.getInstance().createGame(cg.playStyle,
@@ -171,8 +172,7 @@ public class CluelessServlet extends WebSocketServlet{
            }
            else if(cmd instanceof PlayerQuit){
               PlayerQuit pq = (PlayerQuit) cmd;
-              pq.quit = GameManager.getInstance().getGame(pq.gameId).removePlayer(
-                        GameManager.getInstance().getGame(pq.gameId).getPlayer(myoutbound));
+              pq.quit = GameManager.getInstance().leaveGame(gameId, pq.playerId);
               
               if(GameManager.getInstance().getGame(pq.gameId).getPlayerCount() == 0)
                  GameManager.getInstance().deleteGame(pq.gameId);

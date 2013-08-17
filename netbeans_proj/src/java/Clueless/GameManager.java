@@ -148,6 +148,14 @@ public class GameManager {
       return retVal;
    }
    
+   public boolean leaveGame(Long gameId, Long playerId){
+      boolean retVal;
+      synchronized(_gamesLock){
+         retVal = _games.get(gameId).removePlayer(_games.get(gameId).getPlayer(playerId));
+      }
+      return retVal;
+   }
+   
    public void deleteGame(Long gameId){
       System.out.print("Deleting game, new game count: ");
       synchronized(_gamesLock){
