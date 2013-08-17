@@ -69,7 +69,7 @@ $('#page-create form').on('submit', function () {
             cmd: 'KeepAlive',
             playerId: data.playerId,
             gameId: data.id
-        });
+        }));
         window.location = '/pregame.html?id=' + data.id;
     };
 

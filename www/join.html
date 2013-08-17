@@ -95,7 +95,7 @@ ws.onopen = function (e) {
                     cmd: 'KeepAlive',
                     playerId: data.playerId,
                     gameId: data.gameId
-                });
+                }));
                 window.location = '/pregame.html?id=' + data.gameId;
             } else {
                 alert('Cannot join the game!');
