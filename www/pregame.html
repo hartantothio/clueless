@@ -9,22 +9,6 @@
 <title>Clueless</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
-<script src="/js/jquery.cookie.js"></script>
-<script src="/js/jquery.fancybox.min.js"></script>
-<script src="/js/plugin.js"></script>
-<script>
-var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
-    me_id = +$.cookie('player_id'),
-    game_id = +getUrlVars()['id'];
-
-ws.send(JSON.stringify({
-    cmd: 'KeepAlive',
-    playerId: me_id,
-    gameId: game_id
-}));
-</script>
 <link rel="stylesheet" href="/css/jquery.fancybox.css" />
 <link rel="stylesheet" href="/css/style.css" />
 <body>
@@ -47,9 +31,17 @@ ws.send(JSON.stringify({
 </div>
 
 </body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.cookie.js"></script>
+<script src="/js/jquery.fancybox.min.js"></script>
+<script src="/js/plugin.js"></script>
 <script>
 $(function () {
-    var creator_id = null,
+    var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+        me_id = +$.cookie('player_id'),
+        game_id = +getUrlVars()['id'],
+        creator_id = null,
         $table = $('table'),
         characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
 
@@ -79,9 +71,9 @@ $(function () {
 
     ws.onopen = function () {
         ws.send(JSON.stringify({
-            cmd: 'QueryGames',
-            playStyle: '',
-            secured: ''
+            cmd: 'KeepAlive',
+            playerId: me_id,
+            gameId: game_id
         }));
     };
 
@@ -145,6 +137,11 @@ $(function () {
             }
         } else if (data.cmd === 'KeepAlive') {
             alert('KEEP ALIVE!');
+            ws.send(JSON.stringify({
+                cmd: 'QueryGames',
+                playStyle: '',
+                secured: ''
+            }));
         }
     };
 
