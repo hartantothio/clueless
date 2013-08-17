@@ -113,6 +113,10 @@ public class Player {
       return _clientSocket;
    }
    
+   public void setSocket(WsOutbound wso) {
+      _clientSocket = wso;
+   }
+   
    public Long getId(){
       return _id;
    }

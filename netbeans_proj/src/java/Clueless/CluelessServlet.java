@@ -9,7 +9,11 @@ import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +25,8 @@ import org.apache.catalina.websocket.WsOutbound;
 public class CluelessServlet extends WebSocketServlet{
     private static final long serialVersionUID = 1L;
     private static ArrayList<MyMessageInbound> mmiList = new ArrayList<MyMessageInbound>();
+    private static Map<Long, PlayerDeletingRunnable> removals = new HashMap<Long, PlayerDeletingRunnable>();
+    private static ScheduledThreadPoolExecutor remover = new ScheduledThreadPoolExecutor(6);
 
     @Override
     public StreamInbound createWebSocketInbound(String protocol, HttpServletRequest hsr){
@@ -33,28 +39,34 @@ public class CluelessServlet extends WebSocketServlet{
 
         @Override
         public void onOpen(WsOutbound outbound){
-            try {
+//            try {
                 System.out.println("Client connected");
                 this.myoutbound = outbound;
                 mmiList.add(this);
                 //Send the client all our commands
-                StringBuilder sb = new StringBuilder();
-                for(NotificationEnum ne : NotificationEnum.values())
-                   sb = sb.append(ne.toString()).append('\n');
-                outbound.writeTextMessage(CharBuffer.wrap(sb.toString()));
-            } catch (IOException e) {
-                Logger.getLogger(CluelessServlet.class.getName()).log(Level.SEVERE, null, e);
-            }
+//                StringBuilder sb = new StringBuilder();
+//                for(NotificationEnum ne : NotificationEnum.values())
+//                   sb = sb.append(ne.toString()).append('\n');
+//                outbound.writeTextMessage(CharBuffer.wrap(sb.toString()));
+//            } catch (IOException e) {
+//                Logger.getLogger(CluelessServlet.class.getName()).log(Level.SEVERE, null, e);
+//            }
         }
 
         @Override
         public void onClose(int status){
             System.out.println("Client disconnected");
-            if(gameId != null)
-               GameManager.getInstance().getGame(gameId).removePlayer(
-                       GameManager.getInstance().getGame(gameId)
-                       .getPlayer(myoutbound)
-                       );
+            if(gameId != null){
+               Long pId = GameManager.getInstance().getGame(gameId).getPlayer(myoutbound).getId();
+               PlayerDeletingRunnable pdr = new PlayerDeletingRunnable(myoutbound, gameId);
+               CluelessServlet.removals.put(pId, pdr);
+               CluelessServlet.remover.schedule(pdr, 20, TimeUnit.SECONDS);
+            }
+//            if(gameId != null)
+//               GameManager.getInstance().getGame(gameId).removePlayer(
+//                       GameManager.getInstance().getGame(gameId)
+//                       .getPlayer(myoutbound)
+//                       );
             mmiList.remove(this);
         }
 
@@ -165,6 +177,13 @@ public class CluelessServlet extends WebSocketServlet{
               if(GameManager.getInstance().getGame(pq.gameId).getPlayerCount() == 0)
                  GameManager.getInstance().deleteGame(pq.gameId);
               cmd = pq;
+           }
+           else if(cmd instanceof KeepAlive){
+              KeepAlive ka = (KeepAlive) cmd;
+              PlayerDeletingRunnable pdr = CluelessServlet.removals.get(ka.playerId);
+              CluelessServlet.remover.remove(pdr);
+              CluelessServlet.removals.remove(ka.playerId);
+              GameManager.getInstance().getGame(ka.gameId).getPlayer(ka.playerId).setSocket(myoutbound);
            }
            
            //Return result

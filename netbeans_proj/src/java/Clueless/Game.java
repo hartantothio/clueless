@@ -111,6 +111,7 @@ public class Game {
       List<Card> args = new ArrayList<Card>();
       args.add(p.getCharacter());
       notifyAllPlayers(NotificationEnum.PlayerQuit, args);
+      if(_players.indexOf(p) == _currentPlayer) processEndTurn(p);
       boolean retVal = _players.remove(p);
       if(_players.isEmpty()) GameManager.getInstance().deleteGame(Id);
       return retVal;
@@ -119,6 +120,14 @@ public class Game {
    public Player getPlayer(WsOutbound wso){
       for(Player p : _players)
          if(p.getSocket() == wso)
+            return p;
+      
+      return null;
+   }
+   
+   public Player getPlayer(Long id){
+      for(Player p : _players)
+         if(p.getId() == id)
             return p;
       
       return null;
