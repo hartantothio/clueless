@@ -256,7 +256,7 @@ ws.onmessage = function(message) {
                     // print out my character
                     for (j = 0; j < data.games[i].players.length; j++) {
                         if (me_id === +data.games[i].players[j].id) {
-                            addSystemNotification('You are ' + data.games[i].players[j].character);
+                            addSystemNotification('You are ' + data.games[i].players[j].character + '.');
                             break;
                         }
                     }
@@ -308,8 +308,6 @@ $('#btn-quit').on('click', function () {
 });
 
 $('#btn-endturn').on('click', function () {
-    console.dir('123');
-    return false;
     ws.send(JSON.stringify({
         cmd: 'EndTurn',
         gameId: game_id,
