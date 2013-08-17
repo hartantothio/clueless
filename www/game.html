@@ -176,27 +176,29 @@ function toggleGameTurn(show) {
 
                 if (canMove(room)) {
                     switch (e.type) {
-                    case 'mouseenter':
-                        $this.attr('class', 'active');
-                        break;
-                    case 'mouseleave':
-                        $this.attr('class', '');
-                        break;
-                    case 'click':
-                        $this.attr('class', '');
-                        updateCharacter(APP.Me.character, room);
-                        moveCharacter(APP.Me.character, room);
-                        if (isLocationHallway(room)) {
-                            disableSuggest();
-                        }
+                        case 'mouseenter':
+                            $this.attr('class', 'active');
+                            break;
+                        case 'mouseleave':
+                            $this.attr('class', '');
+                            break;
+                        case 'click':
+                            $this.attr('class', '');
+                            disableMove();
 
-                        ws.send(JSON.stringify({
-                            cmd: 'PlayerMove',
-                            playerId: me_id,
-                            gameId: game_id,
-                            room: room
-                        }));
-                        break;
+                            updateCharacter(APP.Me.character, room);
+                            moveCharacter(APP.Me.character, room);
+                            if (isLocationHallway(room)) {
+                                disableSuggest();
+                            }
+
+                            ws.send(JSON.stringify({
+                                cmd: 'PlayerMove',
+                                playerId: me_id,
+                                gameId: game_id,
+                                room: room
+                            }));
+                            break;
                     }
                 }
             }
