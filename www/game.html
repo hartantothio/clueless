@@ -157,7 +157,6 @@ ws.onmessage = function(message) {
     var data = JSON.parse(message.data);
 
     if (data.cmd === 'PlayerChat') {
-        console.dir(data);
         if (data.playerId) {
 
         } else {

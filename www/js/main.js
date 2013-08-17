@@ -62,9 +62,9 @@ function addChatNotification(message) {
         character = message.substring(0, message.indexOf('|', 1) + 1),
         key = null;
 
-    for (k in APP.Characters) {
-        if (APP.Characters[k].alias === character) {
-            character = '<span style="color: ' + APP.Characters[k].color + '">' + character + '</span>';
+    for (key in APP.Characters) {
+        if (APP.Characters[key].alias === character) {
+            character = '<span style="color: ' + APP.Characters[key]['color'] + '">' + character + '</span>';
             break;
         }
     }
