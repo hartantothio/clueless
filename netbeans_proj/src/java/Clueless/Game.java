@@ -5,6 +5,7 @@
 package Clueless;
 
 import CluelessCommands.Command;
+import CluelessCommands.PlayerQuit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ import org.apache.catalina.websocket.WsOutbound;
 public class Game {
    public final long Id;
    public final int creatorId;
+   private boolean started;
    private String _playStyle, _name, _password;
    private Set<Card> _solution;
    private List<Player> _players;
@@ -29,6 +31,7 @@ public class Game {
    public Game(long id, int creatorId, String playStyle, String name, String password){
       Id = id;
       this.creatorId = creatorId;
+      started = false;
       _playStyle = playStyle;
       _name = name;
       _password = password;
@@ -115,13 +118,13 @@ public class Game {
    }
    
    public void updatePlayer(Player p){
-      for(Iterator<Player> i = _players.iterator(); i.hasNext();)
-         if(i.next().getId() == p.getId()){
-            i.remove();
+      for(int i = 0; i < _players.size(); ++i){
+         if(_players.get(i).getId() == p.getId()){
+            _players.remove(i);
+            _players.add(i, p);
             break;
          }
-      
-      _players.add(p);
+      }
    }
    
    public boolean removePlayer(Player p){
@@ -134,10 +137,20 @@ public class Game {
       
       List<Card> args = new ArrayList<Card>();
       args.add(p.getCharacter());
-      notifyAllPlayers(NotificationEnum.PlayerQuit, args);
-      processEndTurn(p);
-      boolean retVal = _players.remove(p);
-      if(retVal)System.out.println("(Game/removePlayer) Player deleted!");
+      notifyAllPlayers(NotificationEnum.PlayerQuitNotice, args);
+      boolean retVal = processEndTurn(p, true);
+      if(retVal) System.out.println("(Game/removePlayer) Player deleted!");
+      if(_players.size() < 3){
+         for(Player p2 : _players){
+            PlayerQuit pq = new PlayerQuit();
+            pq.gameId = Id;
+            pq.playerId = p2.getId();
+            pq.quit = true;
+            p2.alert(pq);
+         }
+         
+         _players.clear();
+      }
       if(_players.isEmpty()) GameManager.getInstance().deleteGame(Id);
       return retVal;
    }
@@ -161,6 +174,7 @@ public class Game {
    }
    
    public Player getCurrentPlayer(){
+      if(_players.isEmpty()) return null;
       return _players.get(_currentPlayer);
    }
    
@@ -170,6 +184,10 @@ public class Game {
    
    public int getPlayerCount(){
       return _players.size();
+   }
+   
+   public boolean getStarted(){
+      return started;
    }
    
    public void alertAllPlayers(Command c){
@@ -226,6 +244,7 @@ public class Game {
       args.add(_players.get(_currentPlayer).getCharacter());
       for(Object o : args) System.out.println("(start) arg: " + o);
       notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
+      started = true;
       return true;
    }
    
@@ -311,18 +330,28 @@ public class Game {
       }
    }
    
-   public void processEndTurn(Player p){
+   public boolean processEndTurn(Player p, boolean quitting){
       //Only the current player can end their turn
       if(_players.indexOf(p) == _currentPlayer) {
+         boolean retVal = true;
          List args = new ArrayList();
          args.add(p.getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerEndTurn, args);
          
-         if(++_currentPlayer >= _players.size()) _currentPlayer = 0;
+         if(quitting)
+            retVal = _players.remove(p);
+         else
+            ++_currentPlayer;
+         
+         if(_currentPlayer >= _players.size())
+            _currentPlayer = 0;
          
          args.clear();
          args.add(_players.get(_currentPlayer).getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
+         return retVal;
       }
+      
+      return false;
    }
 }

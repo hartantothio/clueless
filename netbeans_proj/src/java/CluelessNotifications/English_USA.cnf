@@ -8,5 +8,5 @@ PlayerAccusationCorrect          | "xx's accusation is correct and has therefore
 PlayerAccusationIncorrect        | "xx's accusation is incorrect",
 PlayerEndTurn                    | "xx ends their turn",
 PlayerGetTurn                    | "It is now xx's turn",
-PlayerQuit                       | "xx has left the game",
+PlayerQuitNotice                 | "xx has left the game",
 PlayerChat                       | "(xx) xx"

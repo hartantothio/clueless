@@ -140,12 +140,12 @@ public class GameManager {
    
    public Set<GameInfo> queryGames(String playStyle, Boolean secured){
       Set<GameInfo> retVal = new HashSet<GameInfo>();
-      
       synchronized(_gamesLock){
-      for(Game g : _games.values())
+      for(Game g : _games.values()){
          if((playStyle.equals("") || g.getPlayStyle().equals(playStyle)) &&
                  (secured == null || g.getPassword().equals("") != secured))
             retVal.add(new GameInfo(g));
+      }
       }
       
       return retVal;

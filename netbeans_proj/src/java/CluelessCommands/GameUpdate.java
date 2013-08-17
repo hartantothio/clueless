@@ -14,9 +14,9 @@ import Clueless.GameInfo;
 public class GameUpdate extends Command {
    public final boolean start;
    public final GameInfo gameInfo;
-   public GameUpdate(Game g, boolean start){
+   public GameUpdate(Game g){
       super(GameUpdate.class.getSimpleName());
-      this.start = start;
+      this.start = g.getStarted();
       gameInfo = new GameInfo(g);
    }
 }

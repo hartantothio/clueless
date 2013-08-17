@@ -20,7 +20,7 @@ public enum NotificationEnum {
    PlayerAccusationIncorrect,
    PlayerEndTurn,
    PlayerGetTurn,
-   PlayerQuit,
+   PlayerQuitNotice,
    PlayerChat
    /*PlayerChangedLanguage,
    PlayerChangedCharacter,
