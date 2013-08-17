@@ -237,8 +237,8 @@ ws.onmessage = function(message) {
         if (+data.playerId !== me_id) {
             for (i in APP.Players) {
                 if (APP.Players[i]['id'] ===  +data.playerId) {
-                    updateCharacter(i, room);
-                    moveCharacter(i, room);
+                    updateCharacter(i, data.room);
+                    moveCharacter(i, data.room);
                 }
             }
         }
