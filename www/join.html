@@ -96,7 +96,11 @@ ws.onopen = function (e) {
                     playerId: data.playerId,
                     gameId: data.gameId
                 }));
-                window.location = '/pregame.html?id=' + data.gameId;
+
+                setTimeout(function () {
+                    window.location = '/pregame.html?id=' + data.gameId;
+                }, 1000);
+
             } else {
                 alert('Cannot join the game!');
             }
