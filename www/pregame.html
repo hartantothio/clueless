@@ -25,7 +25,7 @@
             </tr>
         </table><br />
         <ul class="menu">
-            <li><a id="btn-quit" href="/index.html">Main Menu</a></li>
+            <li><a id="btn-quit" href="/">Main Menu</a></li>
         </ul>
     </div>
 </div>
@@ -61,6 +61,14 @@ $(function () {
         }));
     });
 
+    $body.on('click', '#btn-play', function () {
+        ws.send(JSON.stringify({
+            cmd: 'StartGame',
+            gameId: game_id
+        }));
+        return false;
+    });
+
     ws.onopen = function () {
         ws.send(JSON.stringify({
             cmd: 'QueryGames',
@@ -82,7 +90,7 @@ $(function () {
                 for (i = 0; i < data.games.length; i++) {
                     game = data.games[i];
                     if (game.id === game_id) {
-                        creator_id = game.creatorId;
+                        creator_id = +game.creatorId;
                         $('h3').html(game.name);
                         for (i = 0; i < game.players.length; i++) {
                             player = game.players[i];
@@ -95,17 +103,18 @@ $(function () {
                             }
                         }
 
-                        if (game.players.length >= 3) {
-                            $('.menu').append('<li><a href="/game.html?id=' + id + '">Play!</a></li>');
+                        if (game.players.length >= 3 && me_id === creator_id) {
+                            $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
                         }
                         break;
                     }
                 }
 
+                // remove 2nd tr ++
                 $table.find('tr:gt(0)').remove();
                 $table.append(tmp);
 
-                // create select
+                // replace the first one with select bo
                 tmp = '';
                 tmp_2 = $table.find('tr:eq(1)').find('td:eq(1)');
                 player = tmp_2.text();
@@ -117,12 +126,15 @@ $(function () {
                 tmp_2.replaceWith(tmp);
             }
         } else if (data.cmd === 'PlayerQuit') {
-            console.dir(data);
-            //window.location = '/index.html';
+            //console.dir(data);
         } else if (data.cmd === 'ChangeCharacter') {
-            console.dir(data);
-        } else {
-            //.location = '/pregame.html?id=' + data.id;
+            //console.dir(data);
+        } else if (data.cmd === 'StartGame') {
+            if (data.started) {
+                window.location = '/game.html?id=' + game_id;
+            } else {
+                alert('Cannot start the game!');
+            }
         }
     };
 
@@ -134,15 +146,15 @@ $(function () {
 
         return false;
     });
-/*
+
     var interval_id = setInterval(function () {
         ws.send(JSON.stringify({
             cmd: 'QueryGames',
             playStyle: '',
             secured: ''
         }));
-    }, 500);
-*/
+    }, 2000);
+
 });
 </script>
 </body>
