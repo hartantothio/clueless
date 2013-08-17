@@ -307,12 +307,12 @@ ws.onmessage = function(message) {
                         }
                     }
 
+                    init();
+
                     // store player_id
                     for (j = 0; j < data.games[i].players.length; j++) {
-                        APP.Players[data.games[i].players[j].character]['id'] = +data.games[i].players[j].id
+                        APP.Players[data.games[i].players[j].character]['id'] = +data.games[i].players[j].id;
                     }
-
-                    init();
                     break;
                 }
             }
