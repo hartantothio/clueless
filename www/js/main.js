@@ -102,33 +102,27 @@ function init() {
     // For this character, also get the cards
 
     APP.Players = {
-        'Plum': {
+        'Professor Plum': {
             location: 'Ballroom'
         },
-        'Green': {
+        'Mr. Green': {
             location: 'Study'
         },
-        'Peacock': {
+        'Ms. Peacock': {
             location: 'Lounge'
         },
-        'White': {
+        'Mrs. White': {
             location: 'Billiard'
         },
-        'Scarlet': {
+        'Miss Scarlet': {
             location: 'Kitchen'
         },
-        'Mustard': {
+        'Colonel Mustard': {
             location: 'Library'
         }
     };
 
-    APP.Me = {
-        character: 'Plum',
-        can_move: true,
-        can_suggest: true
-    };
-
-    moveCharacter('Plum', APP.Me.location, true);
+    moveCharacter(APP.Me.character, APP.Me.location, true);
 
     for (var key in APP.Players) {
         moveCharacter(key, APP.Players[key].location, true);
@@ -237,124 +231,6 @@ function moveCharacter(character, target) {
     APP.Characters[character]['svg'].animate(1000).move(x, y);
 } // moveCharacter()
 
-function accuse(accusation) {
-
-} // accuse()
-
-function suggest(suggestion) {
-
-} // suggest()
-
-function disprove(card) {
-
-} // disprove()
-
-function quit() {
-
-} // quit()
-
-function sendMessage(message) {
-
-} // sendMessage()
-
-function changeLanguage(language) {
-
-} // changeLanguage()
-
-function toggleSound(enable) {
-
-} // toggleSound()
-
-function receiveNotifcation(notification) {
-
-} // receiveNotification()
-
-function displayDetectivePad() {
-
-} // displayDetectivePad()
-
-
-
-init();
-
-/* suggest/accuse */
-/*
-var $game_accuse_suggest = $('#game-accuse-suggest');
-$body.on('click', '#submit-suggest', function () {
-    var character = $('#game-accuse-suggest').find('select[name="character"] :selected').text(),
-        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
-        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
-
-    if (confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon)) {
-        disableSuggest();
-        closeModal();
-    }
-});
-
-$body.on('click', '#submit-accuse', function () {
-    return false;
-    var character = $game_accuse_suggest.find('select[name="character"] option:selected').text(),
-        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
-        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
-
-    return confirm('Accuse ' + character + ' of murder in the ' + room + ' with the ' + weapon);
-});
-*/
-
-/* suggest/accuse */
-$('#btn-accuse-suggest').on('click', function () {
-    $.fancybox({
-        'centerOnScroll': true,
-        'content': $($(this).attr('href'))[0].outerHTML,
-        'onComplete': function () {
-            $('select[name="action"]').change();
-        }
-    });
-    return false;
-});
-
-$body.on('submit', '#game-accuse-suggest form', function () {
-    var $this = $(this),
-        action = $this.find('select[name="action"]').val(),
-        short_character = $this.find('select[name="character"]').val(),
-        long_character = $this.find('select[name="character"] option:selected').text(),
-        room = null;
-        weapon = $this.find('select[name="weapon"]').val();
-
-    if (action === 'suggest') {
-        room = APP.Players[APP.Me.character].location;
-        if (confirm('Suggest ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
-            moveCharacter(short_character, APP.Players[APP.Me.character].location);
-            closeModal();
-            disableSuggest();
-            addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
-        } else {
-
-        }
-    } else {
-        room = $this.find('select[name="room"]').val();
-        if (confirm('Accuse ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
-            short_character = short_character.toLowerCase();
-            room = room.toLowerCase();
-            weapon = weapon.toLowerCase();
-            if (short_character === APP.Solution.player && room === APP.Solution.room && weapon === APP.Solution.weapon) {
-                alert("Congratulations! You've solved the mystery.");
-            } else {
-                alert("Sorry, you made the wrong accusation.");
-            }
-        }
-    }
-
-    return false;
-});
-
-$body.on('change', 'select[name="action"]', function () {
-    if (this.value === 'accuse') {
-        $('#game-accuse-suggest .room').show();
-    } else {
-        $('#game-accuse-suggest .room').hide();
-    }
-});
 
 
 

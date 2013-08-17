@@ -141,6 +141,7 @@ var APP = {};
     APP.Passages = {};
     APP.Hallways = {};
     APP.Characters = {},
+    APP.Me = {},
     ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
     me_id = +$.cookie('player_id'),
     game_id = +getUrlVars()['id'],
@@ -189,7 +190,13 @@ function toggleGameTurn(show) {
                         if (isLocationHallway(room)) {
                             disableSuggest();
                         }
-                        disableMove();
+
+                        ws.send(JSON.stringify({
+                            cmd: 'PlayerMove',
+                            playerId: me_id,
+                            gameId: game_id,
+                            room: room
+                        }));
                         break;
                     }
                 }
@@ -221,13 +228,22 @@ ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
         i = 0,
         j = 0;
-console.dir(data);
+
     if (data.cmd === 'KeepAlive') {
 
+    } else if (data.cmd === 'PlayerMoved') {
+        addSystemNotification(data.msg);
+    } else if (data.cmd === 'PlayerMove') {
+        if (+data.playerId !== me_id) {
+            for (i in APP.Players) {
+                if (APP.Players[i]['id'] ===  +data.playerId) {
+                    updateCharacter(i, room);
+                    moveCharacter(i, room);
+                }
+            }
+        }
     } else if (data.cmd === 'PlayerChat') {
-        if (data.playerId) {
-
-        } else {
+        if (!data.playerId) {
             addChatNotification(data.msg);
         }
     } else if (data.cmd === 'PlayerQuit') {
@@ -245,7 +261,7 @@ console.dir(data);
         GameUpdate
         PlayerGetTurn
         */
-        toggleGameTurn(false)
+        toggleGameTurn(false);
     } else if (data.cmd === 'PlayerEndTurn') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerGetTurn') {
@@ -267,6 +283,13 @@ console.dir(data);
                     for (j = 0; j < data.games[i].players.length; j++) {
                         if (me_id === +data.games[i].players[j].id) {
                             addSystemNotification('You are ' + data.games[i].players[j].character + '.');
+
+                            APP.Me = {
+                                character: data.games[i].players[j].character,
+                                id: +data.games[i].players[j].id,
+                                can_move: false,
+                                can_suggest: false
+                            };
                             break;
                         }
                     }
@@ -275,9 +298,21 @@ console.dir(data);
                     for (j = 0; j < data.games[i].players.length; j++) {
                         if (+data.games[i].players[j].id === +data.games[i].currentPlayer) {
                             addSystemNotification('It is now ' + data.games[i].players[j].character + '\'s turn.');
+
+                            if (APP.Me.id === +data.games[i].currentPlayer) {
+                                APP.Me['can_move'] = true;
+                                APP.Me['can_suggest'] = true;
+                            }
                             break;
                         }
                     }
+
+                    // store player_id
+                    for (j = 0; j < data.games[i].players.length; j++) {
+                        APP.Players[data.games[i].players[j].character]['id'] = +data.games[i].players[j].id
+                    }
+
+                    init();
                     break;
                 }
             }
@@ -330,6 +365,85 @@ $('#btn-endturn').on('click', function () {
         }));
     }
     return false;
+});
+
+/* suggest/accuse */
+/*
+var $game_accuse_suggest = $('#game-accuse-suggest');
+$body.on('click', '#submit-suggest', function () {
+    var character = $('#game-accuse-suggest').find('select[name="character"] :selected').text(),
+        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
+        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
+
+    if (confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon)) {
+        disableSuggest();
+        closeModal();
+    }
+});
+
+$body.on('click', '#submit-accuse', function () {
+    return false;
+    var character = $game_accuse_suggest.find('select[name="character"] option:selected').text(),
+        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
+        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
+
+    return confirm('Accuse ' + character + ' of murder in the ' + room + ' with the ' + weapon);
+});
+*/
+
+/* suggest/accuse */
+$('#btn-accuse-suggest').on('click', function () {
+    $.fancybox({
+        'centerOnScroll': true,
+        'content': $($(this).attr('href'))[0].outerHTML,
+        'onComplete': function () {
+            $('select[name="action"]').change();
+        }
+    });
+    return false;
+});
+
+$body.on('submit', '#game-accuse-suggest form', function () {
+    var $this = $(this),
+        action = $this.find('select[name="action"]').val(),
+        short_character = $this.find('select[name="character"]').val(),
+        long_character = $this.find('select[name="character"] option:selected').text(),
+        room = null;
+        weapon = $this.find('select[name="weapon"]').val();
+
+    if (action === 'suggest') {
+        room = APP.Players[APP.Me.character].location;
+        if (confirm('Suggest ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
+            moveCharacter(short_character, APP.Players[APP.Me.character].location);
+            closeModal();
+            disableSuggest();
+            addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
+        } else {
+
+        }
+    } else {
+        room = $this.find('select[name="room"]').val();
+        if (confirm('Accuse ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
+            short_character = short_character.toLowerCase();
+            room = room.toLowerCase();
+            weapon = weapon.toLowerCase();
+            if (short_character === APP.Solution.player && room === APP.Solution.room && weapon === APP.Solution.weapon) {
+                alert("Congratulations! You've solved the mystery.");
+            } else {
+                alert("Sorry, you made the wrong accusation.");
+            }
+        }
+    }
+
+    return false;
+});
+
+$body.on('change', 'select[name="action"]', function () {
+    if (this.value === 'accuse') {
+        $('#game-accuse-suggest .room').show();
+    } else {
+        $('#game-accuse-suggest .room').hide();
+    }
 });
 
 </script>
