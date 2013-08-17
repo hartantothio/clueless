@@ -58,9 +58,9 @@ public class CluelessServlet extends WebSocketServlet{
             System.out.println("Client disconnected");
             if(gameId != null){
                Long pId = GameManager.getInstance().getGame(gameId).getPlayer(myoutbound).getId();
-               PlayerDeletingRunnable pdr = new PlayerDeletingRunnable(myoutbound, gameId);
+               PlayerDeletingRunnable pdr = new PlayerDeletingRunnable(pId, gameId);
                CluelessServlet.removals.put(pId, pdr);
-               CluelessServlet.remover.schedule(pdr, 20, TimeUnit.SECONDS);
+               CluelessServlet.remover.schedule(pdr, 10, TimeUnit.SECONDS);
             }
 //            if(gameId != null)
 //               GameManager.getInstance().getGame(gameId).removePlayer(
