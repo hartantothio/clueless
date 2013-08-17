@@ -18,7 +18,8 @@ import org.apache.catalina.websocket.WsOutbound;
  * @author davis_gigogne
  */
 public class Game {
-   public final long Id, creatorId;
+   public final long Id;
+   public final int creatorId;
    private String _playStyle, _name, _password;
    private Set<Card> _solution;
    private List<Player> _players;
@@ -157,6 +158,10 @@ public class Game {
       }
       
       return null;
+   }
+   
+   public Player getCurrentPlayer(){
+      return _players.get(_currentPlayer);
    }
    
    public List<Player> getPlayers(){

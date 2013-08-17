@@ -116,8 +116,7 @@ public class CluelessServlet extends WebSocketServlet{
            
            //Begin call logic
            Command cmd = gson.fromJson(cb.toString(), c);
-           if(!(cmd instanceof QueryGames))
-            System.out.println("Raw JSON: " + new String(cb.append('\0').array()));
+           System.out.println("Raw JSON: " + new String(cb.append('\0').array()));
            
            if(cmd instanceof CreateGame){
               CreateGame cg = (CreateGame) cmd;
@@ -217,11 +216,18 @@ public class CluelessServlet extends WebSocketServlet{
               CluelessServlet.removals.remove(ka.playerId);
               GameManager.getInstance().getGame(ka.gameId).getPlayer(ka.playerId).setSocket(myoutbound);
            }
+           else if(cmd instanceof EndTurn){
+              EndTurn et = (EndTurn) cmd;
+              GameManager.getInstance().getGame(et.gameId).processEndTurn(
+                      GameManager.getInstance().getGame(et.gameId).getPlayer(et.playerId)
+                      );
+              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(et.gameId), false);
+              GameManager.getInstance().getGame(et.gameId).alertAllPlayers(gu);
+           }
            
            //Return result
            String retVal = gson.toJson(cmd, c);
-           if(!(cmd instanceof QueryGames))
-            System.out.println("Return JSON: " + retVal);
+           System.out.println("Return JSON: " + retVal);
            myoutbound.writeTextMessage(CharBuffer.wrap(retVal));
         }
 
