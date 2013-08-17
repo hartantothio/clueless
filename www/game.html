@@ -299,8 +299,8 @@ ws.onmessage = function(message) {
                             addSystemNotification('It is now ' + data.games[i].players[j].character + '\'s turn.');
 
                             if (APP.Me.id === +data.games[i].currentPlayer) {
-                                disableMove();
-                                disableSuggest();
+                                enableMove();
+                                enableSuggest();
                             }
                             break;
                         }
