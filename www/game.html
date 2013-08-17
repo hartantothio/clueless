@@ -437,10 +437,10 @@ $body.on('submit', '#game-accuse-suggest form', function () {
             moveCharacter(short_character, APP.Players[APP.Me.character].location);
             closeModal();
             disableSuggest();
-            addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
+            //addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
             ws.send(JSON.stringify({
                 cmd: 'PlayerMove',
-                playerId: me_id,
+                playerId: APP.Players[long_character].id,
                 gameId: game_id,
                 room: room
             }));
