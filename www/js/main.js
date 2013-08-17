@@ -48,10 +48,25 @@ function closeModal() {
     $.fancybox.close();
 } // closeModal()
 
-function addSystemNotification(message) {
+function getDateTime() {
     var date = new Date(),
-        str = date.getHours() + ':' + date.getMinutes(),
-        key = null;
+        hour = date.getHours(),
+        min  = date.getMinutes();
+
+
+    if (hour < 10) {
+        hour = '0' + hour;
+    }
+
+    if (min < 10) {
+        min = '0' + min;
+    }
+
+    return hour + ':' + min;
+}
+
+function addSystemNotification(message) {
+    var key = null;
 
     for (key in APP.Characters) {
         if (message.indexOf(APP.Characters[key].alias) >= 0) {
@@ -60,14 +75,12 @@ function addSystemNotification(message) {
         }
     }
 
-    message = '<p><b>' + str + '</b> - ' + message + '</p>';
+    message = '<p><b>' + getDateTime() + '</b> - ' + message + '</p>';
     $notification_system.prepend(message);
 } // addSystemNotification()
 
 function addChatNotification(message) {
-    var date = new Date(),
-        str = date.getHours() + ':' + date.getMinutes(),
-        character = message.substring(1, message.indexOf(')', 1)),
+    var character = message.substring(1, message.indexOf(')', 1)),
         key = null;
 
     message = (message.replace('(' + character + ')', '')).trim();
@@ -79,7 +92,7 @@ function addChatNotification(message) {
         }
     }
 
-    message = '<p><b>' + character + ' @ ' + str + '</b> - ' + message + '</p>';
+    message = '<p><b>' + character + ' @ ' + getDateTime() + '</b> - ' + message + '</p>';
     $notification_chat.prepend(message);
 } // addChatNotification()
 
