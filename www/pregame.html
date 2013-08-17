@@ -136,7 +136,6 @@ $(function () {
                 alert('Cannot start the game!');
             }
         } else if (data.cmd === 'KeepAlive') {
-            alert('KEEP ALIVE!');
             ws.send(JSON.stringify({
                 cmd: 'QueryGames',
                 playStyle: '',
