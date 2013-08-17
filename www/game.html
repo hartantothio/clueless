@@ -228,7 +228,7 @@ ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
         i = 0,
         j = 0;
-
+console.dir(data);
     if (data.cmd === 'KeepAlive') {
 
     } else if (data.cmd === 'PlayerMoved') {
