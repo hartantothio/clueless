@@ -295,7 +295,7 @@ $('form#chat').on('submit', function () {
     return false;
 });
 
-$('#game-quit').on('click', function () {
+$('#btn-quit').on('click', function () {
     ws.send(JSON.stringify({
         cmd: 'PlayerQuit',
         gameId: game_id,
@@ -304,7 +304,9 @@ $('#game-quit').on('click', function () {
     return false;
 });
 
-$('#game-endturn').on('click', function () {
+$('#btn-endturn').on('click', function () {
+    console.dir('123');
+    return false;
     ws.send(JSON.stringify({
         cmd: 'EndTurn',
         gameId: game_id,
