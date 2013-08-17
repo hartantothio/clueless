@@ -9,7 +9,8 @@ package CluelessCommands;
  * @author davis_gigogne
  */
 public class PlayerChat extends Command {
-   public Long gameId, playerId;
+   public Long gameId;
+   public Integer playerId;
    public String msg;
    
    public PlayerChat(){

@@ -11,10 +11,12 @@ import Clueless.GameInfo;
  *
  * @author davis_gigogne
  */
-public class PlayerJoined extends Command {
+public class GameUpdate extends Command {
+   public final boolean start;
    public final GameInfo gameInfo;
-   public PlayerJoined(Game g){
-      super(PlayerJoined.class.getSimpleName());
+   public GameUpdate(Game g, boolean start){
+      super(GameUpdate.class.getSimpleName());
+      this.start = start;
       gameInfo = new GameInfo(g);
    }
 }

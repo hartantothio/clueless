@@ -10,41 +10,46 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.catalina.websocket.MessageInbound;
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
 
-public class CluelessServlet extends WebSocketServlet implements ServletContextListener{
+public class CluelessServlet extends WebSocketServlet{
     private static final long serialVersionUID = 1L;
     private static ArrayList<MyMessageInbound> mmiList = new ArrayList<MyMessageInbound>();
-    private static Map<Long, PlayerDeletingRunnable> removals = new HashMap<Long, PlayerDeletingRunnable>();
-    private static ScheduledThreadPoolExecutor remover = new ScheduledThreadPoolExecutor(6);
+    private static Map<Integer, ScheduledFuture> removals = new HashMap<Integer, ScheduledFuture>();
+    private static ScheduledThreadPoolExecutor remover =
+            new ScheduledThreadPoolExecutor(6, new ThreadFactory(){
+               @Override
+               public Thread newThread(Runnable r) {
+                  Thread t = Executors.defaultThreadFactory().newThread(r);
+                  t.setDaemon(true);
+                  return t;
+               } 
+            });
+
+   @Override
+   public void destroy() {
+      remover.shutdownNow();
+      super.destroy();
+   }
 
     @Override
     public StreamInbound createWebSocketInbound(String protocol, HttpServletRequest hsr){
         return new MyMessageInbound();
     }
-
-   @Override
-   public void contextInitialized(ServletContextEvent sce) {
-      System.out.println("Context created!");
-   }
-
-   @Override
-   public void contextDestroyed(ServletContextEvent sce) {
-      remover.shutdownNow();
-      System.out.println("Context destroyed!");
-   }
 
     private class MyMessageInbound extends MessageInbound{
         WsOutbound myoutbound;
@@ -70,10 +75,10 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
         public void onClose(int status){
             System.out.println("Client disconnected");
             if(gameId != null){
-               Long pId = GameManager.getInstance().getGame(gameId).getPlayer(myoutbound).getId();
+               Integer pId = GameManager.getInstance().getGame(gameId).getPlayer(myoutbound).getId();
                PlayerDeletingRunnable pdr = new PlayerDeletingRunnable(pId, gameId);
-               CluelessServlet.removals.put(pId, pdr);
-               CluelessServlet.remover.schedule(pdr, 10, TimeUnit.SECONDS);
+               ScheduledFuture sf = CluelessServlet.remover.schedule(pdr, 10, TimeUnit.SECONDS);
+               CluelessServlet.removals.put(pId, sf);
             }
 //            if(gameId != null)
 //               GameManager.getInstance().getGame(gameId).removePlayer(
@@ -85,7 +90,6 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
 
         @Override
         public void onTextMessage(CharBuffer cb) throws IOException{
-           System.out.println("Raw JSON: " + new String(cb.array()));
            JsonReader jr = new JsonReader(new StringReader(cb.toString()));
            Gson gson = new Gson();
            Class<? extends Command> c = null;
@@ -112,6 +116,8 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
            
            //Begin call logic
            Command cmd = gson.fromJson(cb.toString(), c);
+           if(!(cmd instanceof QueryGames))
+            System.out.println("Raw JSON: " + new String(cb.append('\0').array()));
            
            if(cmd instanceof CreateGame){
               CreateGame cg = (CreateGame) cmd;
@@ -135,6 +141,8 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
                  gameId = jg.gameId;
                  jg.playerId = GameManager.getInstance().getGame(jg.gameId)
                          .getPlayer(myoutbound).getId();
+                 GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(jg.gameId), false);
+                 GameManager.getInstance().getGame(jg.gameId).alertAllPlayers(gu);
                  
               }
               cmd = jg;
@@ -157,6 +165,8 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
                       .getPlayer(myoutbound).setCharacter(ch);
               cc.identity = GameManager.getInstance().getGame(cc.gameId)
                       .getPlayer(myoutbound).getCharacter().getName();
+              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(cc.gameId), false);
+              GameManager.getInstance().getGame(cc.gameId).alertAllPlayers(gu);
               cmd = cc;
            }
            else if(cmd instanceof GetAvailableLanguages){
@@ -175,17 +185,25 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
            else if(cmd instanceof StartGame){
               StartGame sg = (StartGame) cmd;
               sg.started = GameManager.getInstance().getGame(sg.gameId).start();
+              if(sg.started){
+                  GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(sg.gameId), true);
+                  GameManager.getInstance().getGame(sg.gameId).alertAllPlayers(gu);
+              }
            }
            else if(cmd instanceof PlayerChat){
               PlayerChat pc = (PlayerChat) cmd;
-              ArrayList args = new ArrayList();
+              List args = new ArrayList();
+              args.add(GameManager.getInstance().getGame(pc.gameId)
+                      .getPlayer(pc.playerId).getCharacter());
               args.add(pc.msg);
               GameManager.getInstance().getGame(pc.gameId)
                       .notifyAllPlayers(NotificationEnum.PlayerChat, args);
            }
            else if(cmd instanceof PlayerQuit){
               PlayerQuit pq = (PlayerQuit) cmd;
-              pq.quit = GameManager.getInstance().leaveGame(gameId, pq.playerId);
+              pq.quit = GameManager.getInstance().leaveGame(pq.gameId, pq.playerId);
+              GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(pq.gameId), false);
+              GameManager.getInstance().getGame(pq.gameId).alertAllPlayers(gu);
               
               if(GameManager.getInstance().getGame(pq.gameId).getPlayerCount() == 0)
                  GameManager.getInstance().deleteGame(pq.gameId);
@@ -193,15 +211,17 @@ public class CluelessServlet extends WebSocketServlet implements ServletContextL
            }
            else if(cmd instanceof KeepAlive){
               KeepAlive ka = (KeepAlive) cmd;
-              PlayerDeletingRunnable pdr = CluelessServlet.removals.get(ka.playerId);
-              CluelessServlet.remover.remove(pdr);
+              ScheduledFuture sf = CluelessServlet.removals.get(ka.playerId);
+              if(sf != null)
+                  sf.cancel(true);
               CluelessServlet.removals.remove(ka.playerId);
               GameManager.getInstance().getGame(ka.gameId).getPlayer(ka.playerId).setSocket(myoutbound);
            }
            
            //Return result
            String retVal = gson.toJson(cmd, c);
-           System.out.println("Return JSON: " + retVal);
+           if(!(cmd instanceof QueryGames))
+            System.out.println("Return JSON: " + retVal);
            myoutbound.writeTextMessage(CharBuffer.wrap(retVal));
         }
 

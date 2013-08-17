@@ -5,7 +5,7 @@
 package Clueless;
 
 import CluelessCommands.Command;
-import CluelessCommands.PlayerChat;
+import CluelessCommands.PlayerUpdate;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.CharBuffer;
@@ -21,7 +21,7 @@ import org.apache.catalina.websocket.WsOutbound;
 public class Player {
    private WsOutbound _clientSocket;
    private Long _game;
-   private Long _id;
+   private Integer _id;
    private boolean _active;
    private Character _character;
    private Set<Card> _clues;
@@ -32,7 +32,7 @@ public class Player {
       _selectedLanguage = lang;
       
       Random r = new Random(System.currentTimeMillis());
-      _id = r.nextLong();
+      _id = r.nextInt();
       if(_id < 0) _id = -_id;
    }
 
@@ -115,9 +115,10 @@ public class Player {
    
    public void setSocket(WsOutbound wso) {
       _clientSocket = wso;
+      GameManager.getInstance().getGame(_game).updatePlayer(this);
    }
    
-   public Long getId(){
+   public Integer getId(){
       return _id;
    }
    
@@ -135,19 +136,18 @@ public class Player {
    public void notify(NotificationEnum notice, List args){
       String msg = NotificationManager.getInstance().getRawNotification(_selectedLanguage, notice);
       
-      if(msg.equals(""))
-         if(args != null && args.iterator().hasNext())
-            msg = "|" + _character.getName() + "| " + args.iterator().next().toString();
+      if(msg.equals("") && args != null && args.iterator().hasNext())
+            msg = args.iterator().next().toString();
       else
-         for(Object arg : args)
-            msg = msg.replace("\\s", arg.toString());
+         for(Object o : args)
+            msg = msg.replaceFirst("xx", o.toString());
 
       try{
-         PlayerChat pc = new PlayerChat();
+         PlayerUpdate pc = new PlayerUpdate(notice);
          pc.gameId = _game;
          pc.msg = msg;
          Gson gson = new Gson();
-      _clientSocket.writeTextMessage(CharBuffer.wrap(gson.toJson(pc, PlayerChat.class)));
+      _clientSocket.writeTextMessage(CharBuffer.wrap(gson.toJson(pc, PlayerUpdate.class)));
       }
       catch(IOException iox){
          System.out.println(iox);

@@ -60,52 +60,65 @@ public class GameManager {
    }
    
    private void createBoard(){
-      Location[][] board  = new Location[5][5];
-      String[] roomNames = {"Study", "Hall", "Lounge", "Library",
-         "Billiard Room", "Dining Room", "Conservatory", "Ballroom", "Kitchen"};
-      
-      //Create the board
-      for(int i = 0; i < 4; ++i)
-         for(int j = 0; j < 4; ++j)
-            if(i % 2 == 0 && j % 2 == 0)
-               board[i][j] = new Room(roomNames[(3*i+j)/2], new Position(i, j));
-            else if(i % 2 == 1 ^ j % 2 == 1)
-               board[i][j] = new Hall("", new Position(i, j));
-            else
-               board[i][j] = null;
-      
-      //Set neighbors
-      Set<Location> neighbors;
-      for(int i = 0; i < 4; ++i)
-         for(int j = 0; j < 4; ++j){
-            neighbors = new HashSet<Location>();
-            
-            if(board[i][j] != null){
-               int a = (i - 1), d = (i + 1), w = (j - 1), s = (j + 1);
-               if(a > -1 && board[a][j] != null) neighbors.add(board[a][j]);
-               if(d > -1 && board[d][j] != null) neighbors.add(board[d][j]);
-               if(w > -1 && board[i][w] != null) neighbors.add(board[i][w]);
-               if(s > -1 && board[i][s] != null) neighbors.add(board[i][s]);
-               
-               if(i == 0){
-                  if(j == 0)
-                     neighbors.add(board[4][4]);
-                  else if(j == 4)
-                     neighbors.add(board[4][0]);
-               }
-               else if(i == 4)
-                  if(j == 0)
-                     neighbors.add(board[0][4]);
-                  else if(j == 4)
-                     neighbors.add(board[0][0]);
-               
-               board[i][j].setNeighbors(neighbors);
-               if(board[i][j] instanceof Room)
-                  _rooms.add((Room)board[i][j]);
-               else
-                  _halls.add((Hall)board[i][j]);
-            }
-         }
+      _rooms.add(new Room("Study", new Position(0,0)));
+      _rooms.add(new Room("Hall", new Position(0,0)));
+      _rooms.add(new Room("Lounge", new Position(0,0)));
+      _rooms.add(new Room("Library", new Position(0,0)));
+      _rooms.add(new Room("Billiard Room", new Position(0,0)));
+      _rooms.add(new Room("Dining Room", new Position(0,0)));
+      _rooms.add(new Room("Conservatory", new Position(0,0)));
+      _rooms.add(new Room("Ballroom", new Position(0,0)));
+      _rooms.add(new Room("Kitchen", new Position(0,0)));
+//      Location[][] board  = new Location[5][5];
+//      String[] roomNames = {"Study", "Hall", "Lounge", "Library",
+//         "Billiard Room", "Dining Room", "Conservatory", "Ballroom", "Kitchen"};
+//      
+//      //Create the board
+//      for(int i = 0; i < 4; ++i)
+//         for(int j = 0; j < 4; ++j)
+//            if(i % 2 == 0 && j % 2 == 0){
+//               System.out.println("New room! " + roomNames[(3*i+j)/2]);
+//               board[i][j] = new Room(roomNames[(3*i+j)/2], new Position(i, j));
+//            }
+//            else if(i % 2 == 1 ^ j % 2 == 1)
+//               board[i][j] = new Hall("", new Position(i, j));
+//            else
+//               board[i][j] = null;
+//      
+//      //Set neighbors
+//      Set<Location> neighbors;
+//      for(int i = 0; i < 4; ++i)
+//         for(int j = 0; j < 4; ++j){
+//            neighbors = new HashSet<Location>();
+//            
+//            if(board[i][j] != null){
+//               int a = (i - 1), d = (i + 1), w = (j - 1), s = (j + 1);
+//               if(a > -1 && board[a][j] != null) neighbors.add(board[a][j]);
+//               if(d > -1 && board[d][j] != null) neighbors.add(board[d][j]);
+//               if(w > -1 && board[i][w] != null) neighbors.add(board[i][w]);
+//               if(s > -1 && board[i][s] != null) neighbors.add(board[i][s]);
+//               
+//               if(i == 0){
+//                  if(j == 0)
+//                     neighbors.add(board[4][4]);
+//                  else if(j == 4)
+//                     neighbors.add(board[4][0]);
+//               }
+//               else if(i == 4)
+//                  if(j == 0)
+//                     neighbors.add(board[0][4]);
+//                  else if(j == 4)
+//                     neighbors.add(board[0][0]);
+//               
+//               board[i][j].setNeighbors(neighbors);
+//               if(board[i][j] instanceof Room)
+//                  _rooms.add((Room)board[i][j]);
+//               else
+//                  _halls.add((Hall)board[i][j]);
+//            }
+//         }
+//      
+//      System.out.println("(createBoard) Final size of rooms: " +_rooms.size());
    }
    
    public static synchronized GameManager getInstance(){
@@ -146,24 +159,27 @@ public class GameManager {
             Game g = _games.get(gameId);
             _games.remove(gameId);
             retVal = g.addPlayer(p);
-            if(retVal) _games.put(gameId, g);
+            if(retVal){
+               _games.put(gameId, g);
+            }
          }
       }
       return retVal;
    }
    
-   public boolean leaveGame(Long gameId, Long playerId){
-      System.out.println("(GameManager) Game ID: " + gameId + " / Player ID: " + playerId);
-      boolean retVal;
+   public boolean leaveGame(Long gameId, Integer playerId){
+      System.out.println("(GameManager/leaveGame) Game ID: " + gameId + " / Player ID: " + playerId);
+      boolean retVal = false;
+      if(gameId == null || playerId == null) return retVal;
       synchronized(_gamesLock){
          Game g = _games.get(gameId);
          _games.remove(gameId);
          retVal = g.removePlayer(g.getPlayer(playerId));
          _games.put(gameId, g);
          if(retVal)
-            System.out.println("(GameManager) Player deleted!");
+            System.out.println("(GameManager/leaveGame) Player deleted!");
          else
-            System.out.println("(GameManager) Game failed to delete!");
+            System.out.println("(GameManager/leaveGame) Game failed to delete!");
       }
       return retVal;
    }
@@ -188,11 +204,11 @@ public class GameManager {
     * @return the _board
     */
    public static Set<Room> getRooms() {
-      return _rooms;
+      return new HashSet<Room>(_rooms);
    }
    
    public static Set<Hall> getHalls(){
-      return _halls;
+      return new HashSet<Hall>(_halls);
    }
    
    public static Set<Location> getBoard(){
@@ -202,10 +218,10 @@ public class GameManager {
    }
    
    public static Set<Character> getCharacters(){
-      return _characters;
+      return new HashSet<Character>(_characters);
    }
    
    public static Set<Weapon> getWeapons(){
-      return _weapons;
+      return new HashSet<Weapon>(_weapons);
    }
 }
