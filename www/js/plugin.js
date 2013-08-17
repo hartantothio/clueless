@@ -31,6 +31,12 @@ if (!Array.prototype.indexOf) {
     };
 }
 
+if (!String.prototype.trim) {
+    String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
+}
+
 if (!Array.prototype.remove) {
     Array.prototype.remove = function() {
         var what, a = arguments, L = a.length, ax;

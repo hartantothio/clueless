@@ -29,6 +29,7 @@ h2 {
 
 #sidebar {
     float: left;
+    width: 300px;
 }
 
 #sidebar .notification {

@@ -105,31 +105,37 @@ APP.Passages['4'] = APP.Draw.rect(20, 20)
 // characters
 APP.Characters.Green = {
     alias: 'Mr. Green',
+    color: '#66CD00',
     svg: APP.Draw.circle(10).move(30, 50).fill('#66CD00') // +10, +30
 };
 
 APP.Characters.Scarlet = {
     alias: 'Miss Scarlet',
+    color: '#f00',
     svg: APP.Draw.circle(10).move(60, 50).fill('#f00') // +40, +30
 };
 
 APP.Characters.Plum = {
     alias: 'Professor Plum',
+    color: '#9400A5',
     svg: APP.Draw.circle(10).move(90, 50).fill('#9400A5') // +70, +30
 };
 
 APP.Characters.Peacock = {
-    alias: 'Mrs. Peacock',
+    alias: 'Ms. Peacock',
+    color: '#007FFF',
     svg: APP.Draw.circle(10).move(30, 80).fill('#007FFF') // +10, +60
 };
 
 APP.Characters.White = {
     alias: 'Mrs. White',
+    color: '#000',
     svg: APP.Draw.circle(10).move(60, 80).fill('#fff').stroke('#000') // +40, +60
 };
 
 APP.Characters.Mustard =  {
     alias: 'Colonel Mustard',
+    color: '#e5e500',
     svg: APP.Draw.circle(10).move(90, 80).fill('#e5e500') // +70, +60
 };
 

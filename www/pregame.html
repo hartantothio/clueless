@@ -43,12 +43,62 @@ $(function () {
         game_id = +getUrlVars()['id'],
         creator_id = null,
         $table = $('table'),
-        characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
+        characters = [];
+
+    function updateGame(game) {
+        var tmp = '',
+            tmp_2 = '',
+            i = 0,
+            j = 0;
+
+        if (!characters.length) {
+            alert('ERROR!');
+        }
+
+        // update title
+        $('h3').html(game.name);
+        creator_id = +game.creatorId;
+
+        // update players list
+        for (i = 0; i < game.players.length; i++) {
+            player = game.players[i];
+            tmp_2 = '<tr class="placeholder"><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
+            if (player.id === me_id) {
+                tmp_2 = '<tr class="placeholder"><td>' + (i+1) + '</td><td><select name="character"><option value="' + player.character + '">' + player.character + '</option>';
+
+                for (j = 0; j < characters.length; j++) {
+                    if (characters[j].name === player.character) {
+                        continue;
+                    }
+
+                    tmp_2 += '<option value="' + characters[j].name + '">' + characters[j].name + '</option>';
+                }
+
+                tmp_2 += '</td></tr>';
+                tmp = tmp_2 + tmp;
+            } else {
+                tmp += '<tr class="placeholder"><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
+            }
+        }
+
+        $table.find('.placeholder').remove();
+        $table.append(tmp);
+
+        // toggle play button
+        if (game.players.length >= 3 && me_id === creator_id) {
+            if (!$('#btn-play').length) {
+                $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
+            }
+        } else if ($('#btn-play').length) {
+            $('#btn-play').parent('li').remove();
+        }
+    } // updateGame()
 
     $('#btn-quit').on('click', function () {
         ws.send(JSON.stringify({
             cmd: 'PlayerQuit',
-            gameId: game_id
+            gameId: game_id,
+            playerId: me_id
         }));
         return false;
     });
@@ -75,64 +125,37 @@ $(function () {
             playerId: me_id,
             gameId: game_id
         }));
+
+        ws.send(JSON.stringify({
+            cmd: 'GetAvailableCharacters',
+            gameId: game_id
+        }));
+
+        ws.send(JSON.stringify({
+            cmd: 'QueryGames',
+            playStyle: '',
+            secured: ''
+        }));
     };
 
     ws.onmessage = function(message) {
         var data = JSON.parse(message.data),
-            i = 0,
-            tmp = '',
-            tmp_2 = '',
-            game = null,
-            player = null;
+            i = 0;
 
         if (data.cmd === 'QueryGames') {
             if (data.games && data.games.length) {
                 for (i = 0; i < data.games.length; i++) {
                     game = data.games[i];
-                    if (game.id === game_id) {
-                        creator_id = +game.creatorId;
-                        $('h3').html(game.name);
-                        for (i = 0; i < game.players.length; i++) {
-                            player = game.players[i];
-                            characters.remove(player.character);
-                            tmp_2 = '<tr class="placeholder"><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
-                            if (player.id === me_id) {
-                                tmp = tmp_2 + tmp;
-                            } else {
-                                tmp += tmp_2;
-                            }
-                        }
-
-                        if (game.players.length >= 3 && me_id === creator_id) {
-                            if (!$('#btn-play').length) {
-                                $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
-                            }
-                        } else if ($('#btn-play').length) {
-                            $('#btn-play').parent('li').remove();
-                        }
+                    if (data.games[i].id === game_id) {
+                        updateGame(data.games[i]);
                         break;
                     }
                 }
-
-                // remove 2nd tr ++
-                $table.find('.placeholder').remove();
-                $table.append(tmp);
-
-                // replace the first one with select
-                tmp = '';
-                tmp_2 = $table.find('tr:eq(1)').find('td:eq(1)');
-                player = tmp_2.text();
-                tmp += '<option value="' + player + '">' + player + '</option>';
-                for (i = 0; i < characters.length; i++) {
-                    tmp += '<option value="' + characters[i] + '">' + characters[i] + '</option>';
-                }
-                tmp = '<td><select name="character">' + tmp + '</select></td>';
-                tmp_2.replaceWith(tmp);
             }
         } else if (data.cmd === 'PlayerQuit') {
             window.location = '/';
         } else if (data.cmd === 'ChangeCharacter') {
-            //console.dir(data);
+            // don't need to do anything
         } else if (data.cmd === 'StartGame') {
             if (data.started) {
                 window.location = '/game.html?id=' + game_id;
@@ -140,31 +163,26 @@ $(function () {
                 alert('Cannot start the game!');
             }
         } else if (data.cmd === 'KeepAlive') {
-            // keep alive
-            ws.send(JSON.stringify({
-                cmd: 'QueryGames',
-                playStyle: '',
-                secured: ''
-            }));
+
+        } else if (data.cmd === 'GameUpdate') {
+            if (data.start) {
+                window.location = '/game.html?id=' + game_id;
+            } else {
+                characters = [];
+
+                ws.send(JSON.stringify({
+                    cmd: 'GetAvailableCharacters',
+                    gameId: game_id
+                }));
+
+                setTimeout(function () {
+                    updateGame(data.gameInfo);
+                }, 1000);
+            }
+        } else if (data.cmd === 'GetAvailableCharacters') {
+            characters = data.characters;
         }
     };
-
-    $('#page-create form').on('submit', function () {
-        var $this = $(this),
-            style = $this.find('select[name="style"]'),
-            server = $this.find('input[name="server"]'),
-            password = $this.find('input[name="password"]');
-
-        return false;
-    });
-
-    var interval_id = setInterval(function () {
-        ws.send(JSON.stringify({
-            cmd: 'QueryGames',
-            playStyle: '',
-            secured: ''
-        }));
-    }, 2000);
 
 });
 </script>

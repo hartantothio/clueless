@@ -129,49 +129,55 @@
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/jquery.cookie.js"></script>
 <script src="/js/jquery.fancybox.min.js"></script>
 <script src="/js/plugin.js"></script>
 <script src="/js/svg.min.js"></script>
 <script>
 var APP = {};
-APP.Draw = SVG('canvas'); // my canvas object
-APP.Passages = {};
-APP.Hallways = {};
-APP.Characters = {};
-</script>
-<script>
-var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+    APP.Draw = SVG('canvas'); // my canvas object
+    APP.Passages = {};
+    APP.Hallways = {};
+    APP.Characters = {},
+    ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
     me_id = +$.cookie('player_id'),
     game_id = +getUrlVars()['id'],
-    creator_id = null,
     $notification_system = $('#notification-system'),
     $notification_chat = $('#notification-chat');
 
 ws.onopen = function () {
-
+    ws.send(JSON.stringify({
+        cmd: 'KeepAlive',
+        playerId: me_id,
+        gameId: game_id
+    }));
 };
 
 ws.onmessage = function(message) {
     var data = JSON.parse(message.data);
 
     if (data.cmd === 'PlayerChat') {
-        addChatNotification(data.msg);
+        console.dir(data);
+        if (data.playerId) {
+
+        } else {
+            addChatNotification(data.msg);
+        }
     }
 };
 
 $('form#chat').on('submit', function () {
-    var $message = $(this).find('input[name="message"]'),
-        message = $message.val();
-
-    // empty out the message
-    $message.val('');
+    var $message = $(this).find('input[name="message"]');
 
     ws.send(JSON.stringify({
         cmd: 'PlayerChat',
         gameId: game_id,
         playerId: me_id,
-        msg: message
+        msg: $message.val()
     }));
+
+    // empty out the message
+    $message.val('');
 
     return false;
 });

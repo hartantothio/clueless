@@ -49,20 +49,30 @@ function closeModal() {
 } // closeModal()
 
 function addSystemNotification(message) {
-    addNotification(message, $notification_system);
-} // addSystemNotification()
-
-function addChatNotification(message) {
-    addNotification(message, $notification_chat);
-} // addChatNotification()
-
-function addNotification(message, $selector) {
     var date = new Date(),
         str = date.getHours() + ':' + date.getMinutes();
 
-    $selector.prepend('<p><b>' + str + '</b> - ' + message + '.</p>');
-} // addNotification()
+    message = '<p><b>' + str + '</b> - ' + message + '.</p>';
+    $notification_system.prepend(message);
+} // addSystemNotification()
 
+function addChatNotification(message) {
+    var date = new Date(),
+        str = date.getHours() + ':' + date.getMinutes(),
+        character = message.substring(0, message.indexOf('|', 1) + 1),
+        key = null;
+
+    for (k in APP.Characters) {
+        if (APP.Characters[k].alias === character) {
+            character = '<span style="color: ' + APP.Characters[k].color + '">' + character + '</span>';
+            break;
+        }
+    }
+
+    message = (message.replace(character, '')).trim();
+    message = '<p><b>' + character + ' @ ' + str + '</b> - ' + message + '.</p>';
+    $notification_chat.prepend(message);
+} // addChatNotification()
 
 function init() {
 
