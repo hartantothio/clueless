@@ -221,7 +221,7 @@ ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
         i = 0,
         j = 0;
-console.dir(data);
+//console.dir(data);
     if (data.cmd === 'KeepAlive') {
 
     } else if (data.cmd === 'PlayerChat') {
@@ -231,8 +231,17 @@ console.dir(data);
             addChatNotification(data.msg);
         }
     } else if (data.cmd === 'PlayerQuit') {
-        window.location = '/';
+        if (+data.playerId === me_id) {
+            window.location = '/';
+        }
+    } else if (data.cmd === 'PlayerQuitNotice') {
+        addSystemNotification(data.msg);
     } else if (data.cmd === 'EndTurn') {
+        /*
+        PlayerEndTurn
+        GameUpdate
+        PlayerGetTurn
+        */
         toggleGameTurn(false)
     } else if (data.cmd === 'PlayerEndTurn') {
         addSystemNotification(data.msg);
@@ -272,7 +281,7 @@ console.dir(data);
         }
     } else if (data.cmd === 'GameUpdate') {
         if (me_id === +data.gameInfo.currentPlayer) {
-            toggleGameTurn(true)
+            toggleGameTurn(true);
         }
     }
 
