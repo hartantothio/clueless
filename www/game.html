@@ -28,8 +28,8 @@
     <ul class="menu">
         <li><a id="btn-accuse-suggest" href="#game-accuse-suggest" id="btn-accuse-suggest">Suggest/Accuse</a></li>
         <!--<li><a href="#game-menu" data-toggle="modal">Menu</a></li>-->
-        <li><a id="btn-endturn" href="#game-endturn" onclick="return confirm('Are you sure you want to end your turn?');">End Turn</a></li>
-        <li><a id="btn-quit" href="#game-quit" onclick="return confirm('Are you sure you want to quit?');">Quit</a></li>
+        <li><a id="btn-endturn" href="#game-endturn">End Turn</a></li>
+        <li><a id="btn-quit" href="#game-quit">Quit</a></li>
     </ul>
 </div>
 
@@ -238,9 +238,6 @@ ws.onmessage = function(message) {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerGetTurn') {
         addSystemNotification(data.msg);
-        if (me_id === +data.playerId) {
-            toggleGameTurn(true)
-        }
     } else if (data.cmd === 'QueryGames') {
         if (data.games && data.games.length) {
             for (i = 0; i < data.games.length; i++) {
@@ -264,7 +261,7 @@ ws.onmessage = function(message) {
                     // print out the turn
                     for (j = 0; j < data.games[i].players.length; j++) {
                         if (+data.games[i].players[j].id === +data.games[i].currentPlayer) {
-                            addSystemNotification('It is ' + data.games[i].players[j].character + '\'s turn.');
+                            addSystemNotification('It is now ' + data.games[i].players[j].character + '\'s turn.');
                             break;
                         }
                     }
@@ -273,7 +270,9 @@ ws.onmessage = function(message) {
             }
         }
     } else if (data.cmd === 'GameUpdate') {
-
+        if (me_id === +data.currentPlayer) {
+            toggleGameTurn(true)
+        }
     }
 
 };
@@ -299,20 +298,24 @@ $('form#chat').on('submit', function () {
 });
 
 $('#btn-quit').on('click', function () {
-    ws.send(JSON.stringify({
-        cmd: 'PlayerQuit',
-        gameId: game_id,
-        playerId: me_id
-    }));
+    if (confirm('Are you sure you want to quit?')) {
+        ws.send(JSON.stringify({
+            cmd: 'PlayerQuit',
+            gameId: game_id,
+            playerId: me_id
+        }));
+    }
     return false;
 });
 
 $('#btn-endturn').on('click', function () {
-    ws.send(JSON.stringify({
-        cmd: 'EndTurn',
-        gameId: game_id,
-        playerId: me_id
-    }));
+    if (confirm('Are you sure you want to end your turn?')) {
+        ws.send(JSON.stringify({
+            cmd: 'EndTurn',
+            gameId: game_id,
+            playerId: me_id
+        }));
+    }
     return false;
 });
 
