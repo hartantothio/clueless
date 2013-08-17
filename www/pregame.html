@@ -85,7 +85,8 @@ $(function () {
         $table.append(tmp);
 
         // toggle play button
-        if (game.players.length >= 3 && me_id === creator_id) {
+        //if (game.players.length >= 3 && me_id === creator_id) {
+        if (game.players.length >= 1 && me_id === creator_id) {
             if (!$('#btn-play').length) {
                 $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
             }
