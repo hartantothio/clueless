@@ -256,39 +256,6 @@ function displayDetectivePad() {
 
 init();
 
-$body.on('mouseenter mouseleave click', 'rect', function (e) {
-    if (APP.Me.can_move) {
-        var $this = $(this),
-            room  = $this.data('id');
-
-        if ($this.data('type') === 'passage') {
-            room  = getHiddenPassageDestination(room);
-            $this = $('rect[data-id="' + room + '"]');
-        }
-
-        //if (isValidNeighbor(getMyLocation(), room)) {
-        if (canMove(room)) {
-            switch (e.type) {
-            case 'mouseenter':
-                $this.attr('class', 'active');
-                break;
-            case 'mouseleave':
-                $this.attr('class', '');
-                break;
-            case 'click':
-                $this.attr('class', '');
-                updateCharacter(APP.Me.character, room);
-                moveCharacter(APP.Me.character, room);
-                if (isLocationHallway(room)) {
-                    disableSuggest();
-                }
-                disableMove();
-                break;
-            }
-        }
-    }
-});
-
 /* suggest/accuse */
 /*
 var $game_accuse_suggest = $('#game-accuse-suggest');

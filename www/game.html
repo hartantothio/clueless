@@ -26,10 +26,10 @@
     </div>
     <div class="clear"></div>
     <ul class="menu">
-        <li><a href="#game-accuse-suggest" id="btn-accuse-suggest">Suggest/Accuse</a></li>
+        <li><a id="btn-accuse-suggest" href="#game-accuse-suggest" id="btn-accuse-suggest">Suggest/Accuse</a></li>
         <!--<li><a href="#game-menu" data-toggle="modal">Menu</a></li>-->
-        <li><a href="#game-endturn" onclick="return confirm('Are you sure you want to end your turn?');">End Turn</a></li>
-        <li><a href="#game-quit" onclick="return confirm('Are you sure you want to quit?');">Quit</a></li>
+        <li><a id="btn-endturn" href="#game-endturn" onclick="return confirm('Are you sure you want to end your turn?');">End Turn</a></li>
+        <li><a id="btn-quit" href="#game-quit" onclick="return confirm('Are you sure you want to quit?');">Quit</a></li>
     </ul>
 </div>
 
@@ -147,8 +147,8 @@ var APP = {};
     creator_id = null,
     $notification_system = $('#notification-system'),
     $notification_chat = $('#notification-chat'),
-    $game_accuse_suggest = $('#game-accuse-suggest'),
-    $game_endturn = $('#game-endturn');
+    $btn_accuse_suggest = $('#btn-accuse-suggest'),
+    $btn_endturn = $('#btn-endturn');
 
 function updateGame(game) {
     // update title
@@ -158,11 +158,44 @@ function updateGame(game) {
 
 function toggleGameTurn(show) {
     if (show === true) {
-        $game_accuse_suggest.show();
-        $game_endturn.show();
+        $btn_accuse_suggest.show();
+        $btn_endturn.show();
+        $body.on('mouseenter mouseleave click', 'rect', function (e) {
+            if (APP.Me.can_move) {
+                var $this = $(this),
+                    room  = $this.data('id');
+
+                if ($this.data('type') === 'passage') {
+                    room  = getHiddenPassageDestination(room);
+                    $this = $('rect[data-id="' + room + '"]');
+                }
+
+                //if (isValidNeighbor(getMyLocation(), room)) {
+                if (canMove(room)) {
+                    switch (e.type) {
+                    case 'mouseenter':
+                        $this.attr('class', 'active');
+                        break;
+                    case 'mouseleave':
+                        $this.attr('class', '');
+                        break;
+                    case 'click':
+                        $this.attr('class', '');
+                        updateCharacter(APP.Me.character, room);
+                        moveCharacter(APP.Me.character, room);
+                        if (isLocationHallway(room)) {
+                            disableSuggest();
+                        }
+                        disableMove();
+                        break;
+                    }
+                }
+            }
+        });
     } else {
-        $game_accuse_suggest.hide();
-        $game_endturn.hide();
+        $btn_accuse_suggest.hide();
+        $btn_endturn.hide();
+        $body.off('mouseenter mouseleave click', 'rect');
     }
 } // updateGameTurn()
 
@@ -183,7 +216,7 @@ ws.onopen = function () {
 
 ws.onmessage = function(message) {
     var data = JSON.parse(message.data);
-
+console.dir(data);
     if (data.cmd === 'KeepAlive') {
 
     } else if (data.cmd === 'PlayerChat') {
@@ -199,12 +232,18 @@ ws.onmessage = function(message) {
             for (i = 0; i < data.games.length; i++) {
                 if (data.games[i].id === game_id) {
                     updateGame(data.games[i]);
+
+                    if (+data.games[i].currentPlayer === me_id) {
+                        toggleGameTurn(true);
+                    } else {
+                        toggleGameTurn(false);
+                    }
                     break;
                 }
             }
         }
     } else if (data.cmd === 'GameUpdate') {
-        console.dir(data);
+
     } else if (data.cmd === 'EndTurn') {
         toggleGameTurn(false);
     }
