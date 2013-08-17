@@ -240,7 +240,9 @@ function moveCharacter(character, target, ignore_total) {
                 continue;
             }
 
-            moveCharacter(APP.Rooms[key]['people'], key, true);
+            for (i = 0; i < length; i++) {
+                moveCharacter(APP.Rooms[key]['people'][i], key, true);
+            }
         }
     }
 } // moveCharacter()
