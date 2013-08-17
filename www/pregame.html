@@ -95,7 +95,7 @@ $(function () {
                         for (i = 0; i < game.players.length; i++) {
                             player = game.players[i];
                             characters.remove(player.character);
-                            tmp_2 = '<tr><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
+                            tmp_2 = '<tr class="placeholder"><td>' + (i+1) + '</td><td>' + player.character + '</td></tr>';
                             if (player.id === me_id) {
                                 tmp = tmp_2 + tmp;
                             } else {
@@ -111,7 +111,7 @@ $(function () {
                 }
 
                 // remove 2nd tr ++
-                $table.find('tr:gt(0)').remove();
+                $table.find('.placeholder').remove();
                 $table.append(tmp);
 
                 // replace the first one with select bo

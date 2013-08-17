@@ -70,7 +70,10 @@ $('#page-create form').on('submit', function () {
             playerId: data.playerId,
             gameId: data.id
         }));
-        window.location = '/pregame.html?id=' + data.id;
+
+        setTimeout(function () {
+            window.location = '/pregame.html?id=' + data.id;
+        }, 1000);
     };
 
     return false;

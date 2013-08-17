@@ -103,6 +103,14 @@ ws.onopen = function (e) {
         }
     };
 };
+
+var interval_id = setInterval(function () {
+    ws.send(JSON.stringify({
+        cmd: 'QueryGames',
+        playStyle: '',
+        secured: ''
+    }));
+}, 2000);
 </script>
 </body>
 </html>

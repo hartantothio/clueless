@@ -10,46 +10,14 @@
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/css/jquery.fancybox.css" />
-<link rel="stylesheet" href="/css/style.css?1" />
-<script>
-/*
-var ws = new WebSocket("ws://localhost:8080/TomcatWebSocket/wschat/WsChatServlet");
-ws.onopen = function(){
-};
-
-ws.onmessage = function(message){
-    document.getElementById("chatlog").textContent += message.data + "\n";
-};
-
-function postToServer(){
-    ws.send(document.getElementById("msg").value);
-    document.getElementById("msg").value = "";
-}
-
-function closeConnect(){
-    ws.close();
-}
-*/
-</script>
+<link rel="stylesheet" href="/css/style.css" />
 <body>
 
 <div id="container">
     <div id="canvas"></div>
     <div id="sidebar">
-        <div class="notification notification-system">
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-            <p><b>12:00 am</b> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ante.</p>
-        </div>
-        <div class="notification">
-
-        </div>
+        <div class="notification notification-system"></div>
+        <div class="notification"></div>
         <form method="post" action="">
             <input type="text" name="message" />
         </form>
@@ -171,7 +139,43 @@ APP.Passages = {};
 APP.Hallways = {};
 APP.Characters = {};
 </script>
-<script src="/js/draw.js?1"></script>
-<script src="/js/main.js?1"></script>
+<script src="/js/draw.js"></script>
+<script src="/js/main.js"></script>
+<script>
+$(function () {
+    var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+        me_id = +$.cookie('player_id'),
+        game_id = +getUrlVars()['id'],
+        creator_id = null,
+        $table = $('table'),
+        characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
+
+    ws.onopen = function () {
+    };
+
+    ws.onmessage = function(message) {
+        var data = JSON.parse(message.data);
+
+        if (data.cmd === 'QueryGames') {
+
+        }
+    };
+
+/*
+    var interval_id = setInterval(function () {
+        ws.send(JSON.stringify({
+            cmd: 'QueryGames',
+            playStyle: '',
+            secured: ''
+        }));
+    }, 500);
+*/
+</script>
 </body>
 </html>
+
+
+
+
+
+
