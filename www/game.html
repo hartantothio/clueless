@@ -221,7 +221,7 @@ ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
         i = 0,
         j = 0;
-
+console.dir(data);
     if (data.cmd === 'KeepAlive') {
 
     } else if (data.cmd === 'PlayerChat') {
@@ -239,6 +239,7 @@ ws.onmessage = function(message) {
     } else if (data.cmd === 'PlayerGetTurn') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'QueryGames') {
+        // first time
         if (data.games && data.games.length) {
             for (i = 0; i < data.games.length; i++) {
                 if (data.games[i].id === game_id) {
@@ -270,7 +271,7 @@ ws.onmessage = function(message) {
             }
         }
     } else if (data.cmd === 'GameUpdate') {
-        if (me_id === +data.currentPlayer) {
+        if (me_id === +data.gameInfo.currentPlayer) {
             toggleGameTurn(true)
         }
     }
