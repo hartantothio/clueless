@@ -105,9 +105,10 @@ $(function () {
 
                         if (game.players.length >= 3 && me_id === creator_id) {
                             if (!$('#btn-play').length) {
-                                $('.menu').append('<li class="btn-play"><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
+                                $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
                             }
-
+                        } else if ($('#btn-play').length) {
+                            $('#btn-play').parent('li').remove();
                         }
                         break;
                     }
@@ -117,7 +118,7 @@ $(function () {
                 $table.find('.placeholder').remove();
                 $table.append(tmp);
 
-                // replace the first one with select bo
+                // replace the first one with select
                 tmp = '';
                 tmp_2 = $table.find('tr:eq(1)').find('td:eq(1)');
                 player = tmp_2.text();
