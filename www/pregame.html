@@ -104,7 +104,10 @@ $(function () {
                         }
 
                         if (game.players.length >= 3 && me_id === creator_id) {
-                            $('.menu').append('<li><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
+                            if (!$('#btn-play').length) {
+                                $('.menu').append('<li class="btn-play"><a id="btn-play" href="/game.html?id=' + game_id + '">Play!</a></li>');
+                            }
+
                         }
                         break;
                     }
@@ -136,6 +139,7 @@ $(function () {
                 alert('Cannot start the game!');
             }
         } else if (data.cmd === 'KeepAlive') {
+            // keep alive
             ws.send(JSON.stringify({
                 cmd: 'QueryGames',
                 playStyle: '',

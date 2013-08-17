@@ -16,9 +16,9 @@
 <div id="container">
     <div id="canvas"></div>
     <div id="sidebar">
-        <div class="notification notification-system"></div>
-        <div class="notification"></div>
-        <form method="post" action="">
+        <div id="notification-system" class="notification notification-system"></div>
+        <div id="notification-chat" class="notification"></div>
+        <form method="post" action="" id="chat">
             <input type="text" name="message" />
         </form>
     </div>
@@ -139,27 +139,42 @@ APP.Passages = {};
 APP.Hallways = {};
 APP.Characters = {};
 </script>
-<script src="/js/draw.js"></script>
-<script src="/js/main.js"></script>
 <script>
-$(function () {
-    var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
-        me_id = +$.cookie('player_id'),
-        game_id = +getUrlVars()['id'],
-        creator_id = null,
-        $table = $('table'),
-        characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
+var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+    me_id = +$.cookie('player_id'),
+    game_id = +getUrlVars()['id'],
+    creator_id = null,
+    $notification_system = $('#notification-system'),
+    $notification_chat = $('#notification-chat');
 
-    ws.onopen = function () {
-    };
+ws.onopen = function () {
 
-    ws.onmessage = function(message) {
-        var data = JSON.parse(message.data);
+};
 
-        if (data.cmd === 'QueryGames') {
+ws.onmessage = function(message) {
+    var data = JSON.parse(message.data);
 
-        }
-    };
+    if (data.cmd === 'PlayerChat') {
+        addChatNotification(data.msg);
+    }
+};
+
+$('form#chat').on('submit', function () {
+    var $message = $(this).find('input[name="message"]'),
+        message = $message.val();
+
+    // empty out the message
+    $message.val('');
+
+    ws.send(JSON.stringify({
+        cmd: 'PlayerChat',
+        gameId: game_id,
+        playerId: me_id,
+        msg: message
+    }));
+
+    return false;
+});
 
 /*
     var interval_id = setInterval(function () {
@@ -171,6 +186,8 @@ $(function () {
     }, 500);
 */
 </script>
+<script src="/js/draw.js"></script>
+<script src="/js/main.js"></script>
 </body>
 </html>
 

@@ -49,11 +49,19 @@ function closeModal() {
 } // closeModal()
 
 function addSystemNotification(message) {
+    addNotification(message, $notification_system);
+} // addSystemNotification()
+
+function addChatNotification(message) {
+    addNotification(message, $notification_chat);
+} // addChatNotification()
+
+function addNotification(message, $selector) {
     var date = new Date(),
         str = date.getHours() + ':' + date.getMinutes();
 
-    $('#sidebar .notification-system').prepend('<p><b>' + str + '</b> - ' + message + '.</p>');
-} // addSystemNotification()
+    $selector.prepend('<p><b>' + str + '</b> - ' + message + '.</p>');
+} // addNotification()
 
 
 function init() {
