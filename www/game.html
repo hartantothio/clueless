@@ -235,9 +235,9 @@ ws.onmessage = function(message) {
     } else if (data.cmd === 'EndTurn') {
         toggleGameTurn(false)
     } else if (data.cmd === 'PlayerEndTurn') {
-        addSystemNotification(msg);
+        addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerGetTurn') {
-        addSystemNotification(msg);
+        addSystemNotification(data.msg);
         if (me_id === +data.playerId) {
             toggleGameTurn(true)
         }
