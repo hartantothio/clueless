@@ -10,7 +10,8 @@ package CluelessCommands;
  */
 public class CreateGame extends Command {
    public String playStyle, name, password, playerLanguage;
-   public Long id, playerId;
+   public Long id;
+   public Integer playerId;
    public CreateGame(){
       super(CreateGame.class.getSimpleName());
    }

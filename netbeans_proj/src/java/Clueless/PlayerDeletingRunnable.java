@@ -9,9 +9,10 @@ package Clueless;
  * @author davis_gigogne
  */
 public class PlayerDeletingRunnable implements Runnable {
-   private long pId, gId;
+   private long gId;
+   private int pId;
    
-   public PlayerDeletingRunnable(long pId, long gId){
+   public PlayerDeletingRunnable(int pId, long gId){
       this.pId = pId;
       this.gId = gId;
    }

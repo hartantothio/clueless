@@ -4,14 +4,18 @@
  */
 package CluelessCommands;
 
+import Clueless.NotificationEnum;
+
 /**
  *
  * @author davis_gigogne
  */
-public class KeepAlive extends Command {
+public class PlayerUpdate extends Command {
    public Long gameId;
    public Integer playerId;
-   public KeepAlive(){
-      super(KeepAlive.class.getSimpleName());
+   public String msg;
+   
+   public PlayerUpdate(NotificationEnum ne){
+      super(ne.toString());
    }
 }

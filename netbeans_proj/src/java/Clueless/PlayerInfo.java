@@ -9,7 +9,7 @@ package Clueless;
  * @author davis_gigogne
  */
 public class PlayerInfo {
-   public Long id;
+   public Integer id;
    public String character;
    
    public PlayerInfo(Player p){

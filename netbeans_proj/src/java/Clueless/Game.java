@@ -6,6 +6,7 @@ package Clueless;
 
 import CluelessCommands.Command;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -24,7 +25,7 @@ public class Game {
    private Player _lastSuggestor;
    private int _currentPlayer;
    
-   public Game(long id, long creatorId, String playStyle, String name, String password){
+   public Game(long id, int creatorId, String playStyle, String name, String password){
       Id = id;
       this.creatorId = creatorId;
       _playStyle = playStyle;
@@ -32,11 +33,16 @@ public class Game {
       _password = password;
       _players = new ArrayList<Player>(6);
       _lastSuggestor = null;
+      _solution = new HashSet<Card>();
    }
    
    private void generateSolution(){
       Random r = new Random(System.currentTimeMillis());
-      _solution.add((Card)GameManager.getCharacters().toArray()[r.nextInt(6)]);
+      Set<Character> chars = GameManager.getCharacters();
+      for(Iterator<Character> i = chars.iterator(); i.hasNext();)
+         if(i.next().getName().equals("-Random-"))
+            i.remove();
+      _solution.add((Card)chars.toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getWeapons().toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getRooms().toArray()[r.nextInt(9)]);
    }
@@ -92,7 +98,7 @@ public class Game {
    
    public Set<Character> getAvailableCharacters(){
       //Remember, <Random> should always be available
-      Set<Character> available = GameManager.getCharacters();
+      Set<Character> available = new HashSet<Character>(GameManager.getCharacters());
       for(Player p : _players)
          if(!p.getCharacter().getName().equals("-Random-"))
          available.remove(p.getCharacter());
@@ -101,34 +107,42 @@ public class Game {
    
    public boolean addPlayer(Player p){
       if(_players.size() > 5) return false;
-      p.setCharacter(getAvailableCharacters().iterator().next());
+      p.setCharacter(new Character("-Random-"));
       p.setActive(true);
       p.setGame(this.Id);
       return _players.add(p);
    }
    
+   public void updatePlayer(Player p){
+      for(Iterator<Player> i = _players.iterator(); i.hasNext();)
+         if(i.next().getId() == p.getId()){
+            i.remove();
+            break;
+         }
+      
+      _players.add(p);
+   }
+   
    public boolean removePlayer(Player p){
       if(p != null)
-         System.out.println("(Game) Player ID: " + p.getId());
+         System.out.println("(Game/removePlayer) Player ID: " + p.getId());
       if(p == null){
-         System.out.println("(Game) Player is null!");
+         System.out.println("(Game/removePlayer) Player is null!");
          return false;
       }
       
       List<Card> args = new ArrayList<Card>();
       args.add(p.getCharacter());
       notifyAllPlayers(NotificationEnum.PlayerQuit, args);
-      if(_players.indexOf(p) == _currentPlayer) processEndTurn(p);
+      processEndTurn(p);
       boolean retVal = _players.remove(p);
-      if(retVal) System.out.println("(Game) Player deleted!");
+      if(retVal)System.out.println("(Game/removePlayer) Player deleted!");
       if(_players.isEmpty()) GameManager.getInstance().deleteGame(Id);
       return retVal;
    }
    
    public Player getPlayer(WsOutbound wso){
-      System.out.println("(Game) getPlayer given wso: " + wso.toString());
       for(Player p : _players){
-         System.out.println("(Game) wso = " + p.getSocket().toString());
          if(p.getSocket().equals(wso))
             return p;
       }
@@ -136,10 +150,8 @@ public class Game {
       return null;
    }
    
-   public Player getPlayer(Long id){
-      System.out.println("(Game) getPlayer given ID: " + id);
+   public Player getPlayer(Integer id){
       for(Player p : _players){
-         System.out.println("(Game) pId = " + p.getId());
          if(p.getId().longValue() == id.longValue())
             return p;
       }
@@ -166,15 +178,16 @@ public class Game {
          _lastSuggestor = null;
       }
       else
-         for(Player p : _players)
+         for(Player p : _players){
             p.notify(notice, args);
+         }
    }
    
    public boolean start(){
       //if(_players.size() < 3) return false;
       
       //Determine a turn order
-      List<Player> reorder = _players;
+      List<Player> reorder = new ArrayList<Player>(_players);
       Random r = new Random(System.currentTimeMillis());
       
       _players.clear();
@@ -190,20 +203,23 @@ public class Game {
       generateSolution();
       
       //Make sure there are no more "random" characters
-      Set<Character> available = getAvailableCharacters();
+      List<Character> available = new ArrayList<Character>(getAvailableCharacters());
       if(available.size() != 1){
          available.remove(new Character("-Random-"));
          for(Player p : _players)
             if(p.getCharacter().getName().equals("-Random-")){
-               Iterator<Character> a = available.iterator();
-               p.setCharacter(a.next());
-               a.remove();
+               System.out.println("(start)Random char!");
+               p.setCharacter(available.get(r.nextInt(available.size())));
+               available.remove(p.getCharacter());
             }
       }
+      
+      for(Player p : _players)System.out.println("(start) P: " + p.getCharacter());
       
       //Notify for turn
       List args = new ArrayList();
       args.add(_players.get(_currentPlayer).getCharacter());
+      for(Object o : args) System.out.println("(start) arg: " + o);
       notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
       return true;
    }
@@ -297,7 +313,7 @@ public class Game {
          args.add(p.getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerEndTurn, args);
          
-         if(++_currentPlayer > _players.size()) _currentPlayer = 0;
+         if(++_currentPlayer >= _players.size()) _currentPlayer = 0;
          
          args.clear();
          args.add(_players.get(_currentPlayer).getCharacter());
