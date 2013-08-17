@@ -9,6 +9,17 @@
 <title>Clueless</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
+    me_id = +$.cookie('player_id'),
+    game_id = +getUrlVars()['id'];
+
+ws.send(JSON.stringify({
+    cmd: 'KeepAlive',
+    playerId: me_id,
+    gameId: game_id
+}));
+</script>
 <link rel="stylesheet" href="/css/jquery.fancybox.css" />
 <link rel="stylesheet" href="/css/style.css" />
 <body>
@@ -38,18 +49,9 @@
 <script src="/js/plugin.js"></script>
 <script>
 $(function () {
-    var ws = new WebSocket("ws://home.mbajoras.net:8080/CluelessV1/CluelessServlet"),
-        me_id = +$.cookie('player_id'),
-        game_id = +getUrlVars()['id'],
-        creator_id = null,
+    var creator_id = null,
         $table = $('table'),
         characters = ['-Random-', 'Professor Plum', 'Mr. Green', 'Colonel Mustard', 'Mrs. White', 'Miss Scarlet', 'Ms. Peacock'];
-
-    ws.send(JSON.stringify({
-        cmd: 'KeepAlive',
-        playerId: me_id,
-        gameId: game_id
-    }));
 
     $('#btn-quit').on('click', function () {
         ws.send(JSON.stringify({
@@ -141,6 +143,8 @@ $(function () {
             } else {
                 alert('Cannot start the game!');
             }
+        } else if (data.cmd === 'KeepAlive') {
+            alert('KEEP ALIVE!');
         }
     };
 
