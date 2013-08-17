@@ -31,6 +31,10 @@
         <li><a id="btn-endturn" href="#game-endturn">End Turn</a></li>
         <li><a id="btn-quit" href="#game-quit">Quit</a></li>
     </ul>
+    <div id="clues">
+        <h3>My Clues</h3>
+        <ul></ul>
+    </div>
 </div>
 
 <div class="modal"><div id="game-pad">
@@ -314,6 +318,13 @@ ws.onmessage = function(message) {
                     for (j = 0; j < data.games[i].players.length; j++) {
                         APP.Players[data.games[i].players[j].character]['id'] = +data.games[i].players[j].id;
                     }
+
+                    // get my own clues
+                    ws.send(JSON.stringify({
+                        cmd: 'GetClues',
+                        playerId: me_id,
+                        gameId: game_id
+                    }));
                     break;
                 }
             }
@@ -324,6 +335,13 @@ ws.onmessage = function(message) {
             enableSuggest();
             toggleGameTurn(true);
         }
+    } else if (data.cmd === 'GetClues') {
+        APP.Me.clues = data.clues;
+        j = '';
+        for (i = 0; i < APP.Me.clues.length; i++) {
+            j += '<li>' + APP.Me.clues[i].name + '</li>';
+        }
+        $('#clues ul').append(j);
     }
 
 };
