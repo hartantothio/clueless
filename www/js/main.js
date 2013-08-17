@@ -59,8 +59,10 @@ function addSystemNotification(message) {
 function addChatNotification(message) {
     var date = new Date(),
         str = date.getHours() + ':' + date.getMinutes(),
-        character = message.substring(0, message.indexOf('|', 1) + 1),
+        character = message.substring(1, message.indexOf(')', 1)),
         key = null;
+
+    message = (message.replace('(' + character + ')', '')).trim();
 
     for (key in APP.Characters) {
         if (APP.Characters[key].alias === character) {
@@ -69,8 +71,7 @@ function addChatNotification(message) {
         }
     }
 
-    message = (message.replace(character, '')).trim();
-    message = '<p><b>' + character + ' @ ' + str + '</b> - ' + message + '.</p>';
+    message = '<p><b>' + character + ' @ ' + str + '</b> - ' + message + '</p>';
     $notification_chat.prepend(message);
 } // addChatNotification()
 
