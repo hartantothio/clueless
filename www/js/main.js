@@ -93,7 +93,7 @@ function init() {
             location: 'Ballroom'
         },
         'Green': {
-            location: 'Hallway11'
+            location: 'Study'
         },
         'Peacock': {
             location: 'Lounge'

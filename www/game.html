@@ -229,8 +229,16 @@ ws.onmessage = function(message) {
         }
     } else if (data.cmd === 'PlayerQuit') {
         window.location = '/';
+    } else if (data.cmd === 'EndTurn') {
+        toggleGameTurn(false)
+    } else if (data.cmd === 'PlayerEndTurn') {
+        addSystemNotification(msg);
+    } else if (data.cmd === 'PlayerGetTurn') {
+        addSystemNotification(msg);
+        if (me_id === +data.playerId) {
+            toggleGameTurn(true)
+        }
     } else if (data.cmd === 'QueryGames') {
-
         if (data.games && data.games.length) {
             for (i = 0; i < data.games.length; i++) {
                 if (data.games[i].id === game_id) {
@@ -242,6 +250,7 @@ ws.onmessage = function(message) {
                         toggleGameTurn(false);
                     }
 
+                    // print out my character
                     for (j = 0; j < data.games[i].players.length; j++) {
                         if (me_id === +data.games[i].players[j].id) {
                             addSystemNotification('You are ' + data.games[i].players[j].character);
@@ -249,9 +258,10 @@ ws.onmessage = function(message) {
                         }
                     }
 
+                    // print out the turn
                     for (j = 0; j < data.games[i].players.length; j++) {
                         if (+data.games[i].players[j].id === +data.games[i].currentPlayer) {
-                            addSystemNotification('It is ' + data.games[i].players[j].character + '\' turn.');
+                            addSystemNotification('It is ' + data.games[i].players[j].character + '\'s turn.');
                             break;
                         }
                     }
@@ -261,10 +271,10 @@ ws.onmessage = function(message) {
         }
     } else if (data.cmd === 'GameUpdate') {
 
-    } else if (data.cmd === 'EndTurn') {
-        toggleGameTurn(false);
     }
+
 };
+
 
 $('form#chat').on('submit', function () {
     var $message = $(this).find('input[name="message"]'),
