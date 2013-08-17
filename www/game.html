@@ -174,7 +174,6 @@ function toggleGameTurn(show) {
                     $this = $('rect[data-id="' + room + '"]');
                 }
 
-                //if (isValidNeighbor(getMyLocation(), room)) {
                 if (canMove(room)) {
                     switch (e.type) {
                     case 'mouseenter':
@@ -228,7 +227,7 @@ ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
         i = 0,
         j = 0;
-console.dir(data);
+
     if (data.cmd === 'KeepAlive') {
 
     } else if (data.cmd === 'PlayerMoved') {
@@ -318,6 +317,9 @@ console.dir(data);
             }
         }
     } else if (data.cmd === 'GameUpdate') {
+        console.dir(data);
+        console.log(me_id);
+        console.log(data.gameInfo.currentPlayer);
         if (me_id === +data.gameInfo.currentPlayer) {
             toggleGameTurn(true);
         }
