@@ -50,9 +50,17 @@ function closeModal() {
 
 function addSystemNotification(message) {
     var date = new Date(),
-        str = date.getHours() + ':' + date.getMinutes();
+        str = date.getHours() + ':' + date.getMinutes(),
+        key = null;
 
-    message = '<p><b>' + str + '</b> - ' + message + '.</p>';
+    for (key in APP.Characters) {
+        if (message.indexOf(APP.Characters[key].alias) >= 0) {
+            message = message.replace(APP.Characters[key].alias, '<span style="color: ' + APP.Characters[key]['color'] + '">' + APP.Characters[key].alias + '</span>');
+            break;
+        }
+    }
+
+    message = '<p><b>' + str + '</b> - ' + message + '</p>';
     $notification_system.prepend(message);
 } // addSystemNotification()
 

@@ -215,8 +215,10 @@ ws.onopen = function () {
 };
 
 ws.onmessage = function(message) {
-    var data = JSON.parse(message.data);
-console.dir(data);
+    var data = JSON.parse(message.data),
+        i = 0,
+        j = 0;
+
     if (data.cmd === 'KeepAlive') {
 
     } else if (data.cmd === 'PlayerChat') {
@@ -228,6 +230,7 @@ console.dir(data);
     } else if (data.cmd === 'PlayerQuit') {
         window.location = '/';
     } else if (data.cmd === 'QueryGames') {
+
         if (data.games && data.games.length) {
             for (i = 0; i < data.games.length; i++) {
                 if (data.games[i].id === game_id) {
@@ -237,6 +240,20 @@ console.dir(data);
                         toggleGameTurn(true);
                     } else {
                         toggleGameTurn(false);
+                    }
+
+                    for (j = 0; j < data.games[i].players.length; j++) {
+                        if (me_id === +data.games[i].players[j].id) {
+                            addSystemNotification('You are ' + data.games[i].players[j].character);
+                            break;
+                        }
+                    }
+
+                    for (j = 0; j < data.games[i].players.length; j++) {
+                        if (+data.games[i].players[j].id === +data.games[i].currentPlayer) {
+                            addSystemNotification('It is ' + data.games[i].players[j].character + '\' turn.');
+                            break;
+                        }
                     }
                     break;
                 }
