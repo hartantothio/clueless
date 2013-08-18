@@ -187,7 +187,12 @@ var APP = {};
     $notification_system = $('#notification-system'),
     $notification_chat = $('#notification-chat'),
     $btn_accuse_suggest = $('#btn-accuse-suggest'),
-    $btn_endturn = $('#btn-endturn');
+    $btn_endturn = $('#btn-endturn'),
+    APP.Suggestion = {
+        'character': null,
+        'room': null,
+        'weapon': null
+    };
 </script>
 <script src="/js/draw.js"></script>
 <script src="/js/main.js?2"></script>
@@ -266,7 +271,8 @@ ws.onopen = function () {
 ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
         i = 0, j = 0,
-        tmp = '', tmp_2 = '';
+        tmp = '';
+        //tmp_2 = '';
 console.dir(data);
     if (data.cmd === 'KeepAlive') {
 
@@ -371,20 +377,30 @@ console.dir(data);
         }
     } else if (data.cmd === 'GetClues') {
         APP.Me.clues = data.clues;
-        tmp = '';
-        tmp_2 = '';
         for (i = 0; i < APP.Me.clues.length; i++) {
             tmp += '<li>' + APP.Me.clues[i].name + '</li>';
-            tmp_2 += '<option value="' + APP.Me.clues[i].name + '">' + APP.Me.clues[i].name + '</option>';
+            //tmp_2 += '<option value="' + APP.Me.clues[i].name + '">' + APP.Me.clues[i].name + '</option>';
         }
         $('#clues ul').append(tmp);
-        $('select[name="clues"]').append(tmp_2);
-    } else if (data.cmd === 'PlayerMustDisproveSuggestion') {
+        //$('select[name="clues"]').append(tmp_2);
+    } else if (data.cmd === 'PlayerMustDisprove') {
+        for (i = 0; i < APP.Me.clues.length; i++) {
+            if (APP.Me.clues[i].name === data.character ||
+                APP.Me.clues[i].name === data.weapon ||
+                APP.Me.clues[i].name === data.room
+            ) {
+                tmp += '<li>' + APP.Me.clues[i].name + '</li>';
+            }
+        }
+
+        $('select[name="clues"]').html(tmp);
         $.fancybox({
             'centerOnScroll': true,
+            'hideOnOverlayClick': false,
+            'showCloseButton': false,
+            'enableEscapeButton': false,
             'content': $('#game-disprove-suggest')[0].outerHTML,
         });
-        return false;
     } else if (data.cmd === 'PlayerMadeSuggestion') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerDisproveSuggestionWithClue') {
@@ -392,6 +408,12 @@ console.dir(data);
     } else if (data.cmd === 'PlayerFailedToDisproveSuggestion') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerSuggest') {
+        APP.Suggestion = {
+            'character': data.character,
+            'room': data.room,
+            'weapon': data.weapon
+        };
+
         if (+data.playerId !== me_id) {
             moveCharacter(data.character, data.room);
         }
