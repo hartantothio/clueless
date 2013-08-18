@@ -168,7 +168,6 @@ public class GameManager {
    }
    
    public boolean leaveGame(Long gameId, Integer playerId){
-      System.out.println("(GameManager/leaveGame) Game ID: " + gameId + " / Player ID: " + playerId);
       boolean retVal = false;
       if(gameId == null || playerId == null) return retVal;
       synchronized(_gamesLock){
@@ -176,10 +175,6 @@ public class GameManager {
          _games.remove(gameId);
          retVal = g.removePlayer(g.getPlayer(playerId));
          _games.put(gameId, g);
-         if(retVal)
-            System.out.println("(GameManager/leaveGame) Player deleted!");
-         else
-            System.out.println("(GameManager/leaveGame) Game failed to delete!");
       }
       return retVal;
    }
@@ -203,25 +198,25 @@ public class GameManager {
    /**
     * @return the _board
     */
-   public static Set<Room> getRooms() {
-      return new HashSet<Room>(_rooms);
+   public static Set<Card> getRooms() {
+      return new HashSet<Card>(_rooms);
    }
    
-   public static Set<Hall> getHalls(){
-      return new HashSet<Hall>(_halls);
+   public static Set<Card> getHalls(){
+      return new HashSet<Card>(_halls);
    }
    
-   public static Set<Location> getBoard(){
-      Set<Location> board = new HashSet<Location>(_rooms);
+   public static Set<Card> getBoard(){
+      Set<Card> board = new HashSet<Card>(_rooms);
       board.addAll(_halls);
       return board;
    }
    
-   public static Set<Character> getCharacters(){
-      return new HashSet<Character>(_characters);
+   public static Set<Card> getCharacters(){
+      return new HashSet<Card>(_characters);
    }
    
-   public static Set<Weapon> getWeapons(){
-      return new HashSet<Weapon>(_weapons);
+   public static Set<Card> getWeapons(){
+      return new HashSet<Card>(_weapons);
    }
 }

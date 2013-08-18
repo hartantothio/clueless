@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class CluelessServlet extends WebSocketServlet{
         @Override
         public void onOpen(WsOutbound outbound){
 //            try {
-                System.out.println("Client connected");
+//              System.out.println("Client connected");
                 this.myoutbound = outbound;
                 mmiList.add(this);
                 //Send the client all our commands
@@ -73,7 +74,7 @@ public class CluelessServlet extends WebSocketServlet{
 
         @Override
         public void onClose(int status){
-            System.out.println("Client disconnected");
+//          System.out.println("Client disconnected");
             if(gameId != null){
                Integer pId = GameManager.getInstance().getGame(gameId).getPlayer(myoutbound).getId();
                PlayerDeletingRunnable pdr = new PlayerDeletingRunnable(pId, gameId);
@@ -154,7 +155,7 @@ public class CluelessServlet extends WebSocketServlet{
            }
            else if(cmd instanceof ChangeCharacter){
               ChangeCharacter cc = (ChangeCharacter) cmd;
-              Set<Character> suspects = GameManager.getCharacters();
+              Set<Character> suspects = new HashSet<Character>((Set)GameManager.getCharacters());
               Character ch = null;
               for(Character ch2 : suspects)
                  if(ch2.getName().equals(cc.identity))
@@ -214,16 +215,58 @@ public class CluelessServlet extends WebSocketServlet{
               if(sf != null)
                   sf.cancel(true);
               CluelessServlet.removals.remove(ka.playerId);
+              try{
               GameManager.getInstance().getGame(ka.gameId).getPlayer(ka.playerId).setSocket(myoutbound);
+              }
+              catch (NullPointerException npe){
+                 System.out.println("***NullPointerException in servlet! Quering a game that doesn't exist perhaps?");
+              }
            }
            else if(cmd instanceof EndTurn){
-              System.out.println("Ending turn!");
               EndTurn et = (EndTurn) cmd;
               GameManager.getInstance().getGame(et.gameId).processEndTurn(
                       GameManager.getInstance().getGame(et.gameId).getPlayer(et.playerId)
                       , false);
               GameUpdate gu = new GameUpdate(GameManager.getInstance().getGame(et.gameId));
               GameManager.getInstance().getGame(et.gameId).alertAllPlayers(gu);
+           }
+           else if(cmd instanceof PlayerMove){
+              PlayerMove pm = (PlayerMove) cmd;
+              ArrayList args = new ArrayList();
+              args.add(GameManager.getInstance().getGame(pm.gameId).getPlayer(pm.playerId));
+              args.add(pm.room);
+              GameManager.getInstance().getGame(pm.gameId).notifyAllPlayers(NotificationEnum.PlayerMoved, args);
+              GameManager.getInstance().getGame(pm.gameId).alertAllPlayers(pm);
+           }
+           else if(cmd instanceof GetClues){
+              GetClues gc = (GetClues) cmd;
+              Set<Card> clues = GameManager.getInstance().getGame(gc.gameId).getPlayer(gc.playerId).getClues();
+              for(Card card : clues) System.out.println(card);
+              gc.clues = clues;
+              cmd = gc;
+           }
+           else if(cmd instanceof PlayerSuggest){
+              PlayerSuggest ps = (PlayerSuggest) cmd;
+              if(ps.disproving == null || ps.disproving == false){
+              GameManager.getInstance().getGame(ps.gameId)
+                      .processSuggestion(myoutbound,
+                      new Character(ps.character),
+                      new Room(ps.room, new Position(0,0)),
+                      new Weapon(ps.weapon));
+              }
+              else{
+                 GameManager.getInstance().getGame(ps.gameId).processDisproveSuggestion(ps);
+              }
+              cmd = ps;
+           }
+           else if(cmd instanceof PlayerAccuse){
+              PlayerAccuse pa = (PlayerAccuse) cmd;
+              GameManager.getInstance().getGame(pa.gameId)
+                      .processAccusation(myoutbound,
+                      new Character(pa.character),
+                      new Room(pa.room, new Position(0,0)),
+                      new Weapon(pa.weapon));
+              cmd = pa;
            }
            
            //Return result

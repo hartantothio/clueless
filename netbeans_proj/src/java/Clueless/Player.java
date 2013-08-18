@@ -123,7 +123,7 @@ public class Player {
    }
    
    public void alert(Command c){
-      System.out.println("!!!ALERT!!!");
+      System.out.println("ALERT!");
       Gson gson = new Gson();
       try{
          _clientSocket.writeTextMessage(CharBuffer.wrap(gson.toJson(c, c.getClass())));
@@ -134,7 +134,7 @@ public class Player {
    }
    
    public void notify(NotificationEnum notice, List args){
-      System.out.println("???NOTIFY???");
+      System.out.println("NOTIFY?");
       String msg = NotificationManager.getInstance().getRawNotification(_selectedLanguage, notice);
       
       if(msg.equals("") && args != null && args.iterator().hasNext())

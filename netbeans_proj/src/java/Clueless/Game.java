@@ -6,6 +6,8 @@ package Clueless;
 
 import CluelessCommands.Command;
 import CluelessCommands.PlayerQuit;
+import CluelessCommands.PlayerSuggest;
+import CluelessCommands.PlayerUpdate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,13 +44,17 @@ public class Game {
    
    private void generateSolution(){
       Random r = new Random(System.currentTimeMillis());
-      Set<Character> chars = GameManager.getCharacters();
+      Set<Character> chars = new HashSet<Character>((Set)GameManager.getCharacters());
       for(Iterator<Character> i = chars.iterator(); i.hasNext();)
          if(i.next().getName().equals("-Random-"))
             i.remove();
       _solution.add((Card)chars.toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getWeapons().toArray()[r.nextInt(6)]);
       _solution.add((Card)GameManager.getRooms().toArray()[r.nextInt(9)]);
+      
+      System.out.println("(Game) solution:");
+      for(Card c : _solution)System.out.println(c);
+      System.out.println("(Game) END solution");
    }
 
    /**
@@ -102,7 +108,7 @@ public class Game {
    
    public Set<Character> getAvailableCharacters(){
       //Remember, <Random> should always be available
-      Set<Character> available = new HashSet<Character>(GameManager.getCharacters());
+      Set<Character> available = new HashSet<Character>((Set)GameManager.getCharacters());
       for(Player p : _players)
          if(!p.getCharacter().getName().equals("-Random-"))
          available.remove(p.getCharacter());
@@ -128,10 +134,7 @@ public class Game {
    }
    
    public boolean removePlayer(Player p){
-      if(p != null)
-         System.out.println("(Game/removePlayer) Player ID: " + p.getId());
       if(p == null){
-         System.out.println("(Game/removePlayer) Player is null!");
          return false;
       }
       
@@ -207,23 +210,42 @@ public class Game {
    }
    
    public boolean start(){
-      //if(_players.size() < 3) return false;
+      if(_players.size() < 3) return false;
       
-      //Determine a turn order
+      //Determine a solution
+      generateSolution();
+      
+      //Get clues for players
+      Set<Card> deck = GameManager.getCharacters();
+      deck.addAll(GameManager.getRooms());
+      deck.addAll(GameManager.getWeapons());
+      deck.removeAll(_solution);
+      deck.remove(new Character("-Random-"));
+      
+      //Determine a turn order and give players clues
       List<Player> reorder = new ArrayList<Player>(_players);
       Random r = new Random(System.currentTimeMillis());
       
       _players.clear();
       int i;
+      Iterator<Card> clueIndex = deck.iterator();
+      Set<Card> clues = new HashSet<Card>();
       while(reorder.size() > 0){
          i = r.nextInt(reorder.size());
+         
+         clues.add(clueIndex.next());
+         clueIndex.remove();
+         clues.add(clueIndex.next());
+         clueIndex.remove();
+         clues.add(clueIndex.next());
+         clueIndex.remove();
+         
+         reorder.get(i).setClues(new HashSet<Card>(clues));
+         clues.clear();
          _players.add(reorder.get(i));
          reorder.remove(i);
       }
       _currentPlayer = 0;
-      
-      //Determine a solution
-      generateSolution();
       
       //Make sure there are no more "random" characters
       List<Character> available = new ArrayList<Character>(getAvailableCharacters());
@@ -231,18 +253,14 @@ public class Game {
          available.remove(new Character("-Random-"));
          for(Player p : _players)
             if(p.getCharacter().getName().equals("-Random-")){
-               System.out.println("(start)Random char!");
                p.setCharacter(available.get(r.nextInt(available.size())));
                available.remove(p.getCharacter());
             }
       }
       
-      for(Player p : _players)System.out.println("(start) P: " + p.getCharacter());
-      
       //Notify for turn
       List args = new ArrayList();
       args.add(_players.get(_currentPlayer).getCharacter());
-      for(Object o : args) System.out.println("(start) arg: " + o);
       notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
       started = true;
       return true;
@@ -277,21 +295,41 @@ public class Game {
          for(Iterator<Card> i = noticeArgs.iterator(); disprover == null && i.hasNext();)
             if(p.getClues().contains(i.next())){
                disprover = p.getCharacter();
-               p.notify(NotificationEnum.PlayerMustDisproveSuggestion, null);
+               p.alert(new PlayerUpdate(NotificationEnum.PlayerMustDisproveSuggestion));
             }
       }
       
       //Send out the appropriate notifications
       noticeArgs.clear();
-      if(disprover != null){
-         noticeArgs.add(disprover);
-         noticeArgs.add(_lastSuggestor.getCharacter());
-         notifyAllPlayers(NotificationEnum.PlayerDisprovedSuggestion, (List)noticeArgs);
-      }
-      else{
+//      if(disprover != null){
+//         noticeArgs.add(disprover);
+//         noticeArgs.add(_lastSuggestor.getCharacter());
+//         notifyAllPlayers(NotificationEnum.PlayerDisprovedSuggestion, (List)noticeArgs);
+//      }
+//      else{
+      if(disprover == null){
          noticeArgs.add(_lastSuggestor.getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerFailedToDisproveSuggestion, (List)noticeArgs);
       }
+   }
+   
+   public void processDisproveSuggestion(PlayerSuggest ps){
+      List args = new ArrayList();
+      args.add(getPlayer(ps.playerId));
+      if(ps.character == null || ps.character.equals("")){
+         if(ps.room == null || ps.room.equals("")){
+            args.add(new Weapon(ps.weapon));
+         }
+         else{
+            args.add(new Room(ps.room, new Position(0,0)));
+         }
+      }
+      else{
+         args.add(new Character(ps.character));
+      }
+      
+      _lastSuggestor.notify(NotificationEnum.PlayerDisprovedSuggestionWithClue, args);
+      _lastSuggestor = null;
    }
    
    public void processAccusation(WsOutbound pConn, Character murderer, Room scene,
