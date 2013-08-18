@@ -122,10 +122,10 @@ function init() {
         }
     };
 
-    moveCharacter(APP.Me.character, APP.Me.location, true);
+    moveCharacter(APP.Me.character, APP.Me.location);
 
     for (var key in APP.Players) {
-        moveCharacter(key, APP.Players[key].location, true);
+        moveCharacter(key, APP.Players[key].location);
     }
 
 } // init()
@@ -183,7 +183,7 @@ function isValidNeighbor(location1, location2) {
     return index >= 0;
 } // isValidNeighbor()
 
-function moveCharacter(character, target, ignore_total) {
+function moveCharacter(character, target) {
     var total_people = 0, remainder = null,
         x = 0, y = 0;
 

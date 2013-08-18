@@ -225,7 +225,7 @@ function toggleGameTurn(show) {
                             disableMove();
 
                             updateCharacter(APP.Me.character, room);
-                            //moveCharacter(APP.Me.character, room);
+                            moveCharacter(APP.Me.character, room);
                             if (isLocationHallway(room)) {
                                 disableSuggest();
                             }
@@ -273,14 +273,14 @@ console.dir(data);
     } else if (data.cmd === 'PlayerMoved') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerMove') {
-        //if (+data.playerId !== me_id) {
+        if (+data.playerId !== me_id) {
             for (i in APP.Players) {
                 if (APP.Players[i]['id'] ===  +data.playerId) {
                     updateCharacter(i, data.room);
                     moveCharacter(i, data.room);
                 }
             }
-        //}
+        }
     } else if (data.cmd === 'PlayerChat') {
         if (!data.playerId) {
             addChatNotification(data.msg);
