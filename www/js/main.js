@@ -41,7 +41,7 @@ function disableSuggest() {
 function enableSuggest() {
     APP.Me.can_suggest = true;
     $('#submit-suggest').show();
-    if (!$('#game-accuse-suggest').find('select[name="action"]').length) {
+    if (!$('#game-accuse-suggest').find('select[name="action"] option[value="suggest"]').length) {
         $('#game-accuse-suggest').find('select[name="action"]').prepend('<option value="suggest">Suggest</option>');
     }
 } // enableSuggest()
