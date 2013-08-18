@@ -168,7 +168,6 @@ public class GameManager {
    }
    
    public boolean leaveGame(Long gameId, Integer playerId){
-      System.out.println("(GameManager/leaveGame) Game ID: " + gameId + " / Player ID: " + playerId);
       boolean retVal = false;
       if(gameId == null || playerId == null) return retVal;
       synchronized(_gamesLock){
@@ -176,10 +175,6 @@ public class GameManager {
          _games.remove(gameId);
          retVal = g.removePlayer(g.getPlayer(playerId));
          _games.put(gameId, g);
-         if(retVal)
-            System.out.println("(GameManager/leaveGame) Player deleted!");
-         else
-            System.out.println("(GameManager/leaveGame) Game failed to delete!");
       }
       return retVal;
    }
