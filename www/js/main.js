@@ -181,6 +181,8 @@ function isValidNeighbor(location1, location2) {
 } // isValidNeighbor()
 
 function moveCharacter(character, target) {
+    updateCharacter(character, target);
+
     var total_people = 0, remainder = null,
         x = 0, y = 0;
 
