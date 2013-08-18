@@ -564,7 +564,7 @@ $body.on('submit', '#game-accuse-suggest form', function () {
             closeModal();
             disableSuggest();
             ws.send(JSON.stringify({
-                cmd: 'PlayerSuggest',
+                cmd: 'PlayerAccuse',
                 playerId: me_id,
                 gameId: game_id,
                 character: long_character,
