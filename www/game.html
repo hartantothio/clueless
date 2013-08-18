@@ -389,11 +389,12 @@ console.dir(data);
                 APP.Me.clues[i].name === data.weapon ||
                 APP.Me.clues[i].name === data.room
             ) {
-                tmp += '<li>' + APP.Me.clues[i].name + '</li>';
+                tmp += '<option value="'+ APP.Me.clues[i].name +'">' + APP.Me.clues[i].name + '</option>';
             }
         }
 
         $('select[name="clues"]').html(tmp);
+        $(window).scrollTop(0);
         $.fancybox({
             'centerOnScroll': true,
             'hideOnOverlayClick': false,
@@ -422,8 +423,7 @@ console.dir(data);
 };
 
 $body.on('submit', '#game-disprove-suggest', function () {
-    var key = null,
-        clue = $(this).find('select[name="clues"]').val(),
+    var clue = $(this).find('select[name="clues"]').val(),
         data = {
             cmd: 'PlayerSuggest',
             playerId: me_id,
@@ -431,27 +431,17 @@ $body.on('submit', '#game-disprove-suggest', function () {
             disproving: true
         };
 
-    for (key in APP.Rooms) {
-        if (key === clue) {
-            key = clue;
-            data['room'] = clue;
-        }
-    }
-
-    if (!key) {
-        for (key in APP.Characters) {
-            if (key === clue) {
-                key = clue;
-                data['character'] = clue;
-            }
-        }
-    }
-
-    if (!key) {
+    if (APP.Rooms[clue]) {
+        data['room'] = clue;
+    } else if (APP.Characters[clue]) {
+        data['character'] = clue;
+    } else {
         data['weapon'] = clue;
     }
 
     ws.send(JSON.stringify(data));
+    closeModal();
+    return false;
 });
 
 
