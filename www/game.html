@@ -402,13 +402,12 @@ console.dir(data);
             'enableEscapeButton': false,
             'content': $('#game-disprove-suggest')[0].outerHTML,
         });
-    } else if (data.cmd === 'PlayerMadeSuggestion') {
-        addSystemNotification(data.msg);
-    } else if (data.cmd === 'PlayerDisprovedSuggestionWithClue') {
-        addSystemNotification(data.msg);
-    } else if (data.cmd === 'PlayerDisprovedSuggestion') {
-        addSystemNotification(data.msg);
-    } else if (data.cmd === 'PlayerFailedToDisproveSuggestion') {
+    } else if (data.cmd === 'PlayerMadeSuggestion' ||
+        data.cmd === 'PlayerDisprovedSuggestionWithClue' ||
+        data.cmd === 'PlayerDisprovedSuggestion' ||
+        data.cmd === 'PlayerFailedToDisproveSuggestion' ||
+        data.cmd === 'PlayerMadeAccusation'
+    ) {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerSuggest') {
         APP.Suggestion = {
@@ -421,6 +420,17 @@ console.dir(data);
             updateCharacter(data.character, data.room);
             moveCharacter(data.character, data.room);
         }
+    } else if (data.cmd === 'PlayerAccuse') {
+        if (data.correct === false) {
+            disableMove();
+            $('#btn-accuse-suggest').hide();
+        }
+    } else if (data.cmd === 'PlayerAccusationCorrect') {
+        addSystemNotification(data.msg);
+        disableMove();
+        $('#btn-accuse-suggest').hide();
+    } else if (data.cmd === 'PlayerAccusationIncorrect') {
+        addSystemNotification(data.msg);
     }
 
 };
@@ -547,19 +557,20 @@ $body.on('submit', '#game-accuse-suggest form', function () {
                 room: room,
                 weapon: weapon
             }));
-            //addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
         }
     } else {
         room = $this.find('select[name="room"]').val();
         if (confirm('Accuse ' + long_character + ' of murder in the ' + room + ' with the ' + weapon)) {
-            short_character = short_character.toLowerCase();
-            room = room.toLowerCase();
-            weapon = weapon.toLowerCase();
-            if (short_character === APP.Solution.player && room === APP.Solution.room && weapon === APP.Solution.weapon) {
-                alert("Congratulations! You've solved the mystery.");
-            } else {
-                alert("Sorry, you made the wrong accusation.");
-            }
+            closeModal();
+            disableSuggest();
+            ws.send(JSON.stringify({
+                cmd: 'PlayerSuggest',
+                playerId: me_id,
+                gameId: game_id,
+                character: long_character,
+                room: room,
+                weapon: weapon
+            }));
         }
     }
 
