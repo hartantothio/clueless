@@ -185,11 +185,7 @@ function isValidNeighbor(location1, location2) {
 
 function moveCharacter(character, target, ignore_total) {
     var total_people = 0, remainder = null,
-        x = 0, y = 0, key = null;
-
-    if (ignore_total !== true && APP.Players[character].location === target) {
-        total_people = -1;
-    }
+        x = 0, y = 0;
 
     if (isLocationRoom(target)) {
         x = 20; y = 30; // initial position
@@ -233,18 +229,6 @@ function moveCharacter(character, target, ignore_total) {
     }
 
     APP.Characters[character]['svg'].animate(1000).move(x, y);
-
-    if (ignore_total !== true) {
-        for (key in APP.Rooms) {
-            if (!APP.Rooms[key]['people'].length) {
-                continue;
-            }
-
-            for (i = 0; i < length; i++) {
-                moveCharacter(APP.Rooms[key]['people'][i], key, true);
-            }
-        }
-    }
 } // moveCharacter()
 
 

@@ -131,6 +131,41 @@
     </form>
 </div></div>
 
+<div class="modal"><div id="game-disprove-suggest" class="box">
+    <h2>Disprove Suggestion</h2>
+    <form action="" method="post">
+        <div class="control-group">
+            <label>Clues: </label>
+            <div class="control">
+                <select name="clues"></select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <ul class="menu">
+                <li><input type="submit" id="btn-submit-disprove-suggest" class="submit" value="Submit" /></li>
+            </ul>
+        </div>
+    </form>
+</div></div>
+
+<div class="modal"><div id="game-disprove-accuse" class="box">
+    <h2>Disprove Accusation</h2>
+    <form action="" method="post">
+        <div class="control-group">
+            <label>Clues: </label>
+            <div class="control">
+                <select name="clues"></select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <ul class="menu">
+                <li><a href="#" class="modal-close">Back</a></li>
+                <li><input type="submit" id="btn-submit-disprove-accuse" class="submit" value="Submit" /></li>
+            </ul>
+        </div>
+    </form>
+</div></div>
+
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
@@ -230,8 +265,8 @@ ws.onopen = function () {
 
 ws.onmessage = function(message) {
     var data = JSON.parse(message.data),
-        i = 0,
-        j = 0;
+        i = 0, j = 0,
+        tmp = '', tmp_2 = '';
 console.dir(data);
     if (data.cmd === 'KeepAlive') {
 
@@ -336,14 +371,60 @@ console.dir(data);
         }
     } else if (data.cmd === 'GetClues') {
         APP.Me.clues = data.clues;
-        j = '';
+        tmp = '';
+        tmp_2 = '';
         for (i = 0; i < APP.Me.clues.length; i++) {
-            j += '<li>' + APP.Me.clues[i].name + '</li>';
+            tmp += '<li>' + APP.Me.clues[i].name + '</li>';
+            tmp_2 += '<option value="' + APP.Me.clues[i].name + '">' + APP.Me.clues[i].name + '</option>';
         }
-        $('#clues ul').append(j);
+        $('#clues ul').append(tmp);
+        $('select[name="clues"]').append(tmp_2);
+    } else if (data.cmd === 'PlayerMustDisproveSuggestion') {
+        $.fancybox({
+            'centerOnScroll': true,
+            'content': $('#game-disprove-suggest')[0].outerHTML,
+        });
+        return false;
+    } else if (data.cmd === 'PlayerMadeSuggest') {
+        addSystemNotification(data.msg);
+    } else if (data.cmd === 'PlayerDisproveSuggestionWithClue') {
+        addSystemNotification(data.msg);
     }
 
 };
+
+$body.on('submit', '#game-disprove-suggest', function () {
+    var key = null,
+        clue = $(this).find('select[name="clues"]').val(),
+        data = {
+            cmd: 'PlayerSuggest',
+            playerId: me_id,
+            gameId: game_id,
+            disproving: true
+        };
+
+    for (key in APP.Rooms) {
+        if (key === clue) {
+            key = clue;
+            data['room'] = clue;
+        }
+    }
+
+    if (!key) {
+        for (key in APP.Characters) {
+            if (key === clue) {
+                key = clue;
+                data['character'] = clue;
+            }
+        }
+    }
+
+    if (!key) {
+        data['weapon'] = clue;
+    }
+
+    ws.send(JSON.stringify(data));
+});
 
 
 $('form#chat').on('submit', function () {
@@ -437,15 +518,15 @@ $body.on('submit', '#game-accuse-suggest form', function () {
             moveCharacter(short_character, APP.Players[APP.Me.character].location);
             closeModal();
             disableSuggest();
-            //addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
             ws.send(JSON.stringify({
-                cmd: 'PlayerMove',
-                playerId: APP.Players[long_character].id,
+                cmd: 'PlayerSuggest',
+                playerId: me_id,
                 gameId: game_id,
-                room: room
+                character: long_character,
+                room: room,
+                weapon: weapon
             }));
-        } else {
-
+            //addSystemNotification('Professor Plum made a suggestion: ' + long_character + ', ' + room + ', ' + weapon);
         }
     } else {
         room = $this.find('select[name="room"]').val();
