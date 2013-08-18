@@ -385,9 +385,11 @@ console.dir(data);
             'content': $('#game-disprove-suggest')[0].outerHTML,
         });
         return false;
-    } else if (data.cmd === 'PlayerMadeSuggest') {
+    } else if (data.cmd === 'PlayerMadeSuggestion') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerDisproveSuggestionWithClue') {
+        addSystemNotification(data.msg);
+    } else if (data.cmd === 'PlayerFailedToDisproveSuggestion') {
         addSystemNotification(data.msg);
     }
 
