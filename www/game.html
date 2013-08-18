@@ -391,6 +391,10 @@ console.dir(data);
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerFailedToDisproveSuggestion') {
         addSystemNotification(data.msg);
+    } else if (data.cmd === 'PlayerSuggest') {
+        if (+data.playerId !== me_id) {
+            moveCharacter(data.character, data.room);
+        }
     }
 
 };
