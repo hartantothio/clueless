@@ -5,6 +5,8 @@
 package Clueless;
 
 import CluelessCommands.Command;
+import CluelessCommands.GameUpdate;
+import CluelessCommands.PlayerMustDisprove;
 import CluelessCommands.PlayerQuit;
 import CluelessCommands.PlayerSuggest;
 import CluelessCommands.PlayerUpdate;
@@ -199,14 +201,9 @@ public class Game {
    }
    
    public void notifyAllPlayers(NotificationEnum notice, List args){
-      if(notice == NotificationEnum.PlayerDisprovedSuggestion){
-         _lastSuggestor.notify(NotificationEnum.PlayerDisprovedSuggestionWithClue, args);
-         _lastSuggestor = null;
+      for(Player p : _players){
+         p.notify(notice, args);
       }
-      else
-         for(Player p : _players){
-            p.notify(notice, args);
-         }
    }
    
    public boolean start(){
@@ -217,10 +214,14 @@ public class Game {
       
       //Get clues for players
       Set<Card> deck = GameManager.getCharacters();
+      for(Iterator<Card> i = deck.iterator(); i.hasNext();)
+         if(i.next().equals(new Character("-Random-")))
+            i.remove();
       deck.addAll(GameManager.getRooms());
       deck.addAll(GameManager.getWeapons());
       deck.removeAll(_solution);
-      deck.remove(new Character("-Random-"));
+      System.out.println("(start) possibilities:");
+      for(Card c : deck) System.out.println(c);
       
       //Determine a turn order and give players clues
       List<Player> reorder = new ArrayList<Player>(_players);
@@ -270,7 +271,7 @@ public class Game {
            Room scene, Weapon weapon){
       //Determine the suggestor from the socket and remove them
       //from the list of possible disproving players
-      List<Player> others = _players;
+      List<Player> others = new ArrayList<Player>(_players);
       for(Player p : _players)
          if(p.getSocket() == pConn){
             _lastSuggestor = p;
@@ -292,11 +293,22 @@ public class Game {
       Character disprover = null;
       for(Player p : others){
          if(disprover != null) break;
-         for(Iterator<Card> i = noticeArgs.iterator(); disprover == null && i.hasNext();)
-            if(p.getClues().contains(i.next())){
-               disprover = p.getCharacter();
-               p.alert(new PlayerUpdate(NotificationEnum.PlayerMustDisproveSuggestion));
+         for(Card c : p.getClues()){
+            if(disprover != null) break;
+            for(Card s : noticeArgs){
+               if(disprover != null) break;
+               if(c.equals(s)){
+                  disprover = p.getCharacter();
+                  PlayerMustDisprove ps = new PlayerMustDisprove();
+                  ps.gameId = Id;
+                  ps.playerId = getPlayer(pConn).getId();
+                  ps.character = murderer.getName();
+                  ps.room = scene.getName();
+                  ps.weapon = weapon.getName();
+                  p.alert(ps);
+               }
             }
+         }
       }
       
       //Send out the appropriate notifications
@@ -329,10 +341,14 @@ public class Game {
       }
       
       _lastSuggestor.notify(NotificationEnum.PlayerDisprovedSuggestionWithClue, args);
+      args.clear();
+      args.add(getPlayer(ps.playerId));
+      args.add(_lastSuggestor);
+      notifyAllPlayers(NotificationEnum.PlayerDisprovedSuggestion, args);
       _lastSuggestor = null;
    }
    
-   public void processAccusation(WsOutbound pConn, Character murderer, Room scene,
+   public boolean processAccusation(WsOutbound pConn, Character murderer, Room scene,
            Weapon weapon){
       //Notify all players
       List<Card> args = new ArrayList<Card>();
@@ -344,7 +360,7 @@ public class Game {
          }
       //This 'if' should never happen, but if not here, Netbeans gives a warning
       //that .getCharacters may be called on a null object
-      if(accuser == null) return;
+      if(accuser == null) return false;
       args.add(accuser.getCharacter());
       args.add(murderer);
       args.add(scene);
@@ -353,18 +369,38 @@ public class Game {
       
       //Determine if the accusation was correct and act appropriately
       args.remove(accuser.getCharacter());
-      if(_solution.containsAll(args)){
+      for(Card c : _solution) System.out.println("(accuse) sol: " + c);
+      for(Card c : args) System.out.println("(accuse) given: " + c);
+      boolean right = true;
+      for(Card c : _solution){
+         if(c instanceof Character && !c.getName().equals(murderer.getName())){
+            right = false;
+            break;
+         }
+         else if(c instanceof Room && !c.getName().equals(scene.getName())){
+            right = false;
+            break;
+         }
+         else if(c instanceof Weapon && !c.getName().equals(weapon.getName())){
+            right = false;
+            break;
+         }
+      }
+      if(right){
          args.clear();
          args.add(accuser.getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerAccusationCorrect, args);
+         return true;
       }
       else{
          args.clear();
          args.add(accuser.getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerAccusationIncorrect, args);
          accuser.setActive(false);
-         _players.remove(accuser);
-         _players.add(accuser);
+         int i = _players.indexOf(accuser);
+         _players.get(i).setActive(false);
+         processEndTurn(accuser, false);
+         return false;
       }
    }
    
@@ -384,9 +420,26 @@ public class Game {
          if(_currentPlayer >= _players.size())
             _currentPlayer = 0;
          
+         int start = _currentPlayer;
+         while(!_players.get(_currentPlayer).isActive()){
+            if(++_currentPlayer >= _players.size())
+               _currentPlayer = 0;
+            if(_currentPlayer == start){
+               PlayerQuit pq = new PlayerQuit();
+               pq.gameId = Id;
+               for(Player p2 : _players){
+                  pq.playerId = p2.getId();
+                  pq.quit = true;
+                  p2.alert(pq);
+               }
+            }
+         }
+         
          args.clear();
          args.add(_players.get(_currentPlayer).getCharacter());
          notifyAllPlayers(NotificationEnum.PlayerGetTurn, args);
+         GameUpdate gu = new GameUpdate(this);
+         alertAllPlayers(gu);
          return retVal;
       }
       

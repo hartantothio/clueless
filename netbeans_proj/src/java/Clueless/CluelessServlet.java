@@ -114,6 +114,9 @@ public class CluelessServlet extends WebSocketServlet{
               Logger.getLogger(CluelessServlet.class.getName()).log(Level.SEVERE, null, cnfe);
               this.myoutbound.writeTextMessage(CharBuffer.wrap(gson.toJson(cnfe)));
            }
+           catch(IllegalStateException ise){
+              
+           }
            
            //Begin call logic
            Command cmd = gson.fromJson(cb.toString(), c);
@@ -253,6 +256,7 @@ public class CluelessServlet extends WebSocketServlet{
                       new Character(ps.character),
                       new Room(ps.room, new Position(0,0)),
                       new Weapon(ps.weapon));
+              GameManager.getInstance().getGame(ps.gameId).alertAllPlayers(ps);
               }
               else{
                  GameManager.getInstance().getGame(ps.gameId).processDisproveSuggestion(ps);
@@ -261,7 +265,7 @@ public class CluelessServlet extends WebSocketServlet{
            }
            else if(cmd instanceof PlayerAccuse){
               PlayerAccuse pa = (PlayerAccuse) cmd;
-              GameManager.getInstance().getGame(pa.gameId)
+              pa.correct = GameManager.getInstance().getGame(pa.gameId)
                       .processAccusation(myoutbound,
                       new Character(pa.character),
                       new Room(pa.room, new Position(0,0)),

@@ -8,12 +8,12 @@ package CluelessCommands;
  *
  * @author davis_gigogne
  */
-public class PlayerAccuse extends Command {
+public class PlayerMustDisprove extends Command {
    public Long gameId;
    public Integer playerId;
    public String character, room, weapon;
-   public boolean correct;
-   public PlayerAccuse(){
-      super(PlayerAccuse.class.getSimpleName());
+   
+   public PlayerMustDisprove(){
+      super(PlayerMustDisprove.class.getSimpleName());
    }
 }

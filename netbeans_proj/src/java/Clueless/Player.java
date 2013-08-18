@@ -139,6 +139,8 @@ public class Player {
       
       if(msg.equals("") && args != null && args.iterator().hasNext())
             msg = args.iterator().next().toString();
+      else if(args == null)
+         msg = "";
       else
          for(Object o : args)
             msg = msg.replaceFirst("xx", o.toString());
