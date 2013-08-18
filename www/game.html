@@ -195,7 +195,7 @@ var APP = {};
     };
 </script>
 <script src="/js/draw.js"></script>
-<script src="/js/main.js?2"></script>
+<script src="/js/main.js?555"></script>
 <script>
 function updateGame(game) {
     // update title
@@ -229,6 +229,7 @@ function toggleGameTurn(show) {
                             $this.attr('class', '');
                             disableMove();
 
+                            updateCharacter(APP.Me.character, room);
                             moveCharacter(APP.Me.character, room);
                             if (isLocationHallway(room)) {
                                 disableSuggest();
@@ -281,6 +282,7 @@ console.dir(data);
         if (+data.playerId !== me_id) {
             for (i in APP.Players) {
                 if (APP.Players[i]['id'] ===  +data.playerId) {
+                    updateCharacter(i, data.room);
                     moveCharacter(i, data.room);
                 }
             }
@@ -415,6 +417,7 @@ console.dir(data);
         };
 
         if (+data.playerId !== me_id) {
+            updateCharacter(data.character, data.room);
             moveCharacter(data.character, data.room);
         }
     } else if (data.cmd === 'PlayerAccuse') {
@@ -497,6 +500,30 @@ $('#btn-endturn').on('click', function () {
     }
     return false;
 });
+
+/* suggest/accuse */
+/*
+var $game_accuse_suggest = $('#game-accuse-suggest');
+$body.on('click', '#submit-suggest', function () {
+    var character = $('#game-accuse-suggest').find('select[name="character"] :selected').text(),
+        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
+        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
+
+    if (confirm('Suggest ' + character + ' of murder in the ' + room + ' with the ' + weapon)) {
+        disableSuggest();
+        closeModal();
+    }
+});
+
+$body.on('click', '#submit-accuse', function () {
+    return false;
+    var character = $game_accuse_suggest.find('select[name="character"] option:selected').text(),
+        weapon = $game_accuse_suggest.find('select[name="weapon"] option:selected').text(),
+        room = $game_accuse_suggest.find('select[name="room"] option:selected').text();
+
+    return confirm('Accuse ' + character + ' of murder in the ' + room + ' with the ' + weapon);
+});
+*/
 
 /* suggest/accuse */
 $('#btn-accuse-suggest').on('click', function () {
