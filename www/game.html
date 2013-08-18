@@ -404,7 +404,9 @@ console.dir(data);
         });
     } else if (data.cmd === 'PlayerMadeSuggestion') {
         addSystemNotification(data.msg);
-    } else if (data.cmd === 'PlayerDisproveSuggestionWithClue') {
+    } else if (data.cmd === 'PlayerDisprovedSuggestionWithClue') {
+        addSystemNotification(data.msg);
+    } else if (data.cmd === 'PlayerDisprovedSuggestion') {
         addSystemNotification(data.msg);
     } else if (data.cmd === 'PlayerFailedToDisproveSuggestion') {
         addSystemNotification(data.msg);
