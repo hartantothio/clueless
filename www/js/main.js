@@ -69,8 +69,9 @@ function addSystemNotification(message) {
     var key = null;
 
     for (key in APP.Characters) {
-        while (message.indexOf(APP.Characters[key].alias) >= 0) {
+        if (message.indexOf(APP.Characters[key].alias) >= 0) {
             message = message.replace(APP.Characters[key].alias, '<span style="color: ' + APP.Characters[key]['color'] + '">' + APP.Characters[key].alias + '</span>');
+            break;
         }
     }
 
