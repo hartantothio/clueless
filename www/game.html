@@ -418,6 +418,7 @@ console.dir(data);
         };
 
         if (+data.playerId !== me_id) {
+            updateCharacter(data.character, data.room);
             moveCharacter(data.character, data.room);
         }
     }
